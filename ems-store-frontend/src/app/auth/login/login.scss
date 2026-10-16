@@ -1,0 +1,106 @@
+.login {
+  min-height: 100vh;
+  background: var(--ems-negro);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 24px;
+
+  &__logo {
+    width: 150px;
+    max-width: 60%;
+    border-radius: 4px;
+  }
+
+  &__tarjeta {
+    width: 100%;
+    max-width: 296px;
+    background: var(--ems-panel);
+    border: 1px solid var(--ems-borde-oscuro);
+    border-radius: 22px;
+    padding: 28px 28px 24px;
+    color: #fff;
+
+    h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 0 0 22px;
+    }
+  }
+}
+.login label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--ems-texto-suave);
+  margin: 14px 0 6px;
+}
+
+.login input {
+  width: 100%;
+  background: var(--ems-input);
+  border: 1px solid var(--ems-borde-oscuro);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 10px 12px;
+  outline: none;
+
+  &::placeholder {
+    color: #4b5563;
+  }
+
+  &:focus {
+    border-color: var(--ems-lime);
+  }
+}
+
+.login__boton {
+  width: 100%;
+  margin-top: 20px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--ems-lime);
+  color: #000;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 11px;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+}
+
+.login__olvido {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.72rem;
+  color: var(--ems-texto-suave);
+}
+
+.campo-clave {
+  position: relative;
+
+  input {
+    padding-right: 78px;
+  }
+
+  &__ver {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: 0;
+    color: var(--ems-lime);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,28 @@
+@use 'bootstrap/scss/bootstrap';
+
+:root {
+  --ems-lime: #b4ff00;
+  --ems-lime-suave: rgba(180, 255, 0, 0.1);
+  --ems-negro: #0a0b0f;
+  --ems-panel: #12141b;
+  --ems-borde-oscuro: #22252f;
+  --ems-input: #1c1e27;
+  --ems-sidebar: #0f1115;
+  --ems-fondo: #f5f6f8;
+  --ems-borde: #e8eaee;
+  --ems-texto: #111827;
+  --ems-texto-suave: #6b7280;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--ems-fondo);
+  color: var(--ems-texto);
+}
+
+.tarjeta {
+  background: #fff;
+  border: 1px solid var(--ems-borde);
+  border-radius: 16px;
+  padding: 20px;
+}
