@@ -1,0 +1,64 @@
+<div class="row g-3">
+  <!-- Lista de usuarios -->
+  <div class="col-12 col-lg-8">
+    <h2 class="titulo-seccion">Usuarios Registrados</h2>
+
+    <section class="tarjeta tabla-tarjeta">
+      <div class="tabla-scroll">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo Electrónico</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Última Conexión</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (u of usuarios; track u.correo) {
+              <tr>
+                <td class="fuerte">{{ u.nombre }}</td>
+                <td class="suave">{{ u.correo }}</td>
+                <td><span [class]="'rol ' + u.claseRol">{{ u.rol }}</span></td>
+                <td>
+                  <span class="estado">
+                    <span [class]="'punto ' + u.claseEstado"></span>{{ u.estado }}
+                  </span>
+                </td>
+                <td class="suave">{{ u.conexion }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Nuevo usuario -->
+  <div class="col-12 col-lg-4">
+    <form class="tarjeta">
+      <h2 class="titulo-formulario">Nuevo Usuario Rápido</h2>
+
+      <label for="nombre">Nombre Completo *</label>
+      <input id="nombre" type="text" placeholder="Ej. Pedro Picapiedra" />
+
+      <label for="correo">Correo Electrónico *</label>
+      <input id="correo" type="text" placeholder="ejemplo@emsstore.com" />
+
+      <label for="rol">Asignar Rol *</label>
+      <select id="rol">
+        <option>Administrador</option>
+        <option selected>Almacén</option>
+        <option>Ventas</option>
+      </select>
+
+      <div class="clave-temporal">
+        <small>Contraseña Temporal</small>
+        <strong>EMSStoreTemp2026</strong>
+      </div>
+
+      <button type="button" class="boton-lima">Crear Usuario</button>
+    </form>
+  </div>
+</div>

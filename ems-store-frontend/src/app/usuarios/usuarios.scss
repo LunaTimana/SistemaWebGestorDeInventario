@@ -1,0 +1,168 @@
+// usuarios y etiquetas 
+.titulo-seccion {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 4px 0 14px;
+}
+
+.tabla-tarjeta {
+  padding: 0;
+  overflow: hidden;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+
+  thead {
+    background: var(--ems-panel);
+  }
+
+  th {
+    padding: 12px 14px;
+    font-size: 0.66rem;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    color: #9ca3af;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--ems-borde);
+    white-space: nowrap;
+  }
+
+  tbody tr:hover {
+    background: #fafbfc;
+  }
+}
+
+.fuerte {
+  font-weight: 700;
+}
+
+.suave {
+  color: var(--ems-texto-suave);
+  font-weight: 500;
+}
+
+.rol {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.66rem;
+  font-weight: 700;
+
+  &.admin {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
+
+  &.almacen {
+    background: #f3e8ff;
+    color: #9333ea;
+  }
+
+  &.ventas {
+    background: #ccfbf1;
+    color: #0f766e;
+  }
+}
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  &.activo {
+    background: #16c26b;
+  }
+
+  &.inactivo {
+    background: #6b7280;
+  }
+}
+
+// formulayo de nuevo usuario 
+.titulo-formulario {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin: 14px 0 6px;
+}
+
+input[type='text'],
+select {
+  width: 100%;
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ems-texto);
+  font-size: 0.78rem;
+  padding: 10px 12px;
+  outline: none;
+
+  &:focus {
+    border-color: #0f1115;
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.clave-temporal {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f3f4f6;
+
+  small {
+    font-size: 0.66rem;
+    color: var(--ems-texto-suave);
+  }
+
+  strong {
+    font-size: 0.8rem;
+  }
+}
+
+.boton-lima {
+  width: 100%;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--ems-lime);
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 11px;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+}

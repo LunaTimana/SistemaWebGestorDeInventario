@@ -1,0 +1,54 @@
+<div class="row g-3 mb-3">
+  @for (r of resumen; track r.titulo) {
+    <div class="col-12 col-md-4">
+      <article class="tarjeta resumen h-100">
+        <div class="resumen__cabecera">
+          <span>{{ r.titulo }}</span>
+          @if (r.tono !== 'neutro') {
+            <span [class]="'punto ' + r.tono"></span>
+          }
+        </div>
+        <strong [class]="'resumen__valor ' + r.tono">{{ r.valor }}</strong>
+      </article>
+    </div>
+  }
+</div>
+
+<section class="tarjeta filtros">
+  <button type="button" class="chip activo">Ver Todos</button>
+  <button type="button" class="chip rojo">Sólo Críticos</button>
+  <button type="button" class="chip naranja">Sólo Riesgo</button>
+</section>
+
+<section class="tarjeta tabla-tarjeta">
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Producto</th>
+          <th>Stock Actual</th>
+          <th>Stock Mínimo</th>
+          <th>Déficit</th>
+          <th>Estado</th>
+          <th>Últ. Ingreso</th>
+          <th>Acción Rápida</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of alertas; track a.sku) {
+          <tr>
+            <td class="fuerte">{{ a.sku }}</td>
+            <td class="fuerte">{{ a.producto }}</td>
+            <td class="fuerte">{{ a.stock }}</td>
+            <td class="suave">{{ a.minimo }}</td>
+            <td class="deficit">{{ a.deficit }}</td>
+            <td><span [class]="'estado ' + a.clase">{{ a.estado }}</span></td>
+            <td class="suave">{{ a.ultimoIngreso }}</td>
+            <td><button type="button" class="boton-lima">Pedir Stock</button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

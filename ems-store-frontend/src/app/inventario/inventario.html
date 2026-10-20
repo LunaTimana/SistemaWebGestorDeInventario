@@ -1,0 +1,75 @@
+<section class="tarjeta barra-herramientas">
+  <div class="buscador">
+    <i class="bi bi-search"></i>
+    <input type="text" placeholder="Buscar por nombre o SKU..." />
+  </div>
+
+  <select class="filtro" aria-label="Categoría">
+    <option>Categoría: Todas</option>
+    <option>Calzado</option>
+    <option>Ropa</option>
+    <option>Accesorios</option>
+  </select>
+
+  <select class="filtro" aria-label="Talla">
+    <option>Talla: Todas</option>
+    <option>S</option>
+    <option>M</option>
+    <option>L</option>
+    <option>XL</option>
+    <option>42</option>
+    <option>43</option>
+  </select>
+
+  <a class="boton-negro" routerLink="/registrar-producto">
+    <i class="bi bi-plus-lg"></i> Registrar Producto
+  </a>
+</section>
+
+<section class="tarjeta tabla-tarjeta">
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Marca</th>
+          <th>Nombre del Producto</th>
+          <th>Categoría</th>
+          <th>Talla</th>
+          <th>Color</th>
+          <th>Stock</th>
+          <th>Precio</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of productos; track p.sku) {
+          <tr>
+            <td class="sku">{{ p.sku }}</td>
+            <td class="suave">{{ p.marca }}</td>
+            <td class="nombre">{{ p.nombre }}</td>
+            <td class="suave">{{ p.categoria }}</td>
+            <td class="fuerte">{{ p.talla }}</td>
+            <td class="suave">{{ p.color }}</td>
+            <td class="fuerte" [class.critico]="p.stock === 0">{{ p.stock }} uds</td>
+            <td class="precio">S/ {{ p.precio.toFixed(2) }}</td>
+            <td><span [class]="'estado ' + p.claseEstado">{{ p.estado }}</span></td>
+            <td class="acciones">
+              <button type="button" aria-label="Editar producto"><i class="bi bi-pencil"></i></button>
+              <button type="button" aria-label="Ver detalle"><i class="bi bi-eye"></i></button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="tabla-pie">
+    <span class="suave">Mostrando 1-5 de 184 productos registrados</span>
+    <div class="paginacion">
+      <button type="button" class="boton-claro">Anterior</button>
+      <button type="button" class="boton-negro">Siguiente</button>
+    </div>
+  </footer>
+</section>

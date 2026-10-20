@@ -1,0 +1,84 @@
+<section class="tarjeta acciones-superiores">
+  <button type="button" class="boton-verde"><i class="bi bi-plus-circle"></i> Nueva entrada</button>
+  <button type="button" class="boton-rojo"><i class="bi bi-plus-circle"></i> Nueva salida</button>
+</section>
+
+<div class="row g-3 mb-3">
+  @for (r of resumen; track r.titulo) {
+    <div class="col-12 col-md-4">
+      <article class="tarjeta resumen h-100">
+        <div class="resumen__cabecera">
+          <span [class]="'resumen__icono ' + r.tono"><i [class]="'bi ' + r.icono"></i></span>
+          <div class="resumen__titulo">
+            <strong>{{ r.titulo }}</strong>
+            <small>{{ r.subtitulo }}</small>
+          </div>
+          <span [class]="'insignia ' + r.tono">{{ r.insignia }}</span>
+        </div>
+        <strong [class]="'resumen__valor ' + r.tono">{{ r.valor }}</strong>
+        <p class="resumen__detalle">{{ r.detalle }}</p>
+      </article>
+    </div>
+  }
+</div>
+
+<section class="tarjeta barra-herramientas">
+  <div class="buscador">
+    <i class="bi bi-search"></i>
+    <input type="text" placeholder="Buscar por SKU o producto..." />
+  </div>
+
+  <select class="filtro" aria-label="Tipo de operación">
+    <option>Tipo: Todos</option>
+    <option>Ingreso</option>
+    <option>Salida</option>
+    <option>Ajuste</option>
+  </select>
+
+  <button type="button" class="filtro">
+    Rango: Hoy (26/10/2026) <i class="bi bi-calendar3"></i>
+  </button>
+
+  <button type="button" class="boton-negro"><i class="bi bi-download"></i> Exportar Excel</button>
+</section>
+
+<section class="tarjeta tabla-tarjeta">
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>ID Movimiento</th>
+          <th>Fecha/Hora</th>
+          <th>Tipo Operación</th>
+          <th>SKU Producto</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Responsable</th>
+          <th>Método/Origen</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of movimientos; track m.id) {
+          <tr>
+            <td class="fuerte">{{ m.id }}</td>
+            <td class="suave">{{ m.fecha }}</td>
+            <td><span [class]="'estado ' + m.clase">{{ m.tipo }}</span></td>
+            <td class="suave">{{ m.sku }}</td>
+            <td class="fuerte">{{ m.producto }}</td>
+            <td [class]="'cantidad ' + m.clase">{{ m.cantidad }}</td>
+            <td class="suave">{{ m.responsable }}</td>
+            <td class="suave">{{ m.origen }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="tabla-pie">
+    <span class="suave">Mostrando 1-5 de 2,412 movimientos registrados</span>
+    <div class="paginacion">
+      <button type="button" class="boton-claro">Anterior</button>
+      <button type="button" class="boton-negro">Siguiente</button>
+    </div>
+  </footer>
+</section>
