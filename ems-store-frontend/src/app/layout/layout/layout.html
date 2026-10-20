@@ -1,0 +1,61 @@
+<div class="app-shell">
+  <aside class="sidebar" [class.abierto]="menuAbierto()">
+    <div class="sidebar__logo">
+      <img src="ems-logo.png" alt="EMS Store" />
+    </div>
+
+    <nav class="sidebar__nav">
+      @for (item of menu; track item.ruta) {
+        <a
+          class="nav-ems"
+          [routerLink]="['/', item.ruta]"
+          routerLinkActive="activo"
+          (click)="menuAbierto.set(false)"
+        >
+          <span class="nav-ems__icono"><i [class]="'bi ' + item.icono"></i></span>
+          <span class="nav-ems__texto">
+            <strong>{{ item.titulo }}</strong>
+            <small>{{ item.subtitulo }}</small>
+          </span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar__pie">
+      <span class="avatar">MM</span>
+      <span class="sidebar__usuario">
+        <strong>ADMINISTRADOR</strong>
+        <small>Admin de Tienda</small>
+      </span>
+    </div>
+  </aside>
+
+  @if (menuAbierto()) {
+    <div class="fondo-menu" (click)="menuAbierto.set(false)"></div>
+  }
+
+  <div class="principal">
+    <header class="topbar">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn-menu d-lg-none" (click)="menuAbierto.set(true)" aria-label="Abrir menú">
+          <i class="bi bi-list"></i>
+        </button>
+        <div>
+          <div class="topbar__ruta">EMS Store / {{ actual()?.titulo }}</div>
+          <h1>{{ actual()?.encabezado }}</h1>
+        </div>
+      </div>
+
+      <div class="topbar__acciones">
+        <span class="chip-sucursal d-none d-md-inline-flex">{{ sucursal }}</span>
+        <button type="button" class="btn-config" aria-label="Configuración">
+          <i class="bi bi-gear"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="contenido">
+      <router-outlet />
+    </main>
+  </div>
+</div>

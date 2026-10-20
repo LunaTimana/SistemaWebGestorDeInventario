@@ -1,0 +1,164 @@
+.kpi {
+  &__cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--ems-texto-suave);
+  }
+
+  &__icono {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+
+    &.verde {
+      background: #e6f9ee;
+      color: #16a34a;
+    }
+
+    &.rojo {
+      background: #fdecec;
+      color: #dc2626;
+    }
+
+    &.naranja {
+      background: #fff3e0;
+      color: #f59e0b;
+    }
+  }
+
+  &__valor {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 14px 0 8px;
+  }
+
+  &__pie {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    color: var(--ems-texto-suave);
+  }
+}
+
+.etiqueta {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+
+  &.verde {
+    background: #e6f9ee;
+    color: #16a34a;
+  }
+
+  &.rojo {
+    background: #fdecec;
+    color: #dc2626;
+  }
+}
+
+// barra izquierda
+.texto-suave {
+  color: var(--ems-texto-suave);
+}
+
+.titulo-seccion {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.categoria {
+  margin-bottom: 14px;
+
+  &__fila {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+}
+
+.barra {
+  height: 8px;
+  border-radius: 999px;
+  background: #eef0f3;
+  overflow: hidden;
+
+  &__relleno {
+    height: 100%;
+    border-radius: 999px;
+  }
+}
+
+.alerta-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--ems-borde);
+  font-size: 0.82rem;
+
+  &__stock {
+    display: flex;
+    gap: 18px;
+    white-space: nowrap;
+  }
+}
+
+.critico {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+//barra derecha
+.acceso {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  color: var(--ems-texto);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    background: #e9ebef;
+    color: var(--ems-texto);
+  }
+
+  &__icono {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: #0f1115;
+    color: var(--ems-lime);
+  }
+}
+
+.transaccion {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  &__punto {
+    width: 8px;
+    height: 8px;
+    margin-top: 6px;
+    flex-shrink: 0;
+    border-radius: 50%;
+  }
+}
