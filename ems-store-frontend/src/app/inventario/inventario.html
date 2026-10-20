@@ -57,7 +57,7 @@
             <td><span [class]="'estado ' + p.claseEstado">{{ p.estado }}</span></td>
             <td class="acciones">
               <button type="button" aria-label="Editar producto"><i class="bi bi-pencil"></i></button>
-              <button type="button" aria-label="Ver detalle"><i class="bi bi-eye"></i></button>
+              <a [routerLink]="['/inventario/detalle', p.sku]" aria-label="Ver detalle"><i class="bi bi-eye"></i></a>
             </td>
           </tr>
         }

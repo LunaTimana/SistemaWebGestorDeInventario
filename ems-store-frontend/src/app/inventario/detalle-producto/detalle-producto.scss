@@ -1,0 +1,178 @@
+// ficha de producto 
+.ficha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  padding: 24px;
+
+  &__imagen {
+    flex: 0 0 200px;
+    max-width: 100%;
+    min-height: 200px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--ems-borde);
+    border-radius: 12px;
+    background: #f3f4f6;
+    color: var(--ems-texto-suave);
+    font-size: 1.1rem;
+  }
+
+  &__datos {
+    flex: 1 1 260px;
+    min-width: 0;
+  }
+
+  &__marca {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #16a34a;
+  }
+
+  &__nombre {
+    margin: 0 0 8px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  &__sku {
+    margin: 0 0 18px;
+    font-size: 0.75rem;
+    color: var(--ems-texto-suave);
+  }
+
+  &__atributos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 18px;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    small {
+      font-size: 0.68rem;
+      color: var(--ems-texto-suave);
+    }
+
+    strong {
+      font-size: 0.9rem;
+    }
+
+    .verde {
+      color: #16a34a;
+    }
+  }
+
+  &__etiqueta {
+    display: block;
+    font-size: 0.68rem;
+    color: var(--ems-texto-suave);
+  }
+
+  &__stock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 2px 0 20px;
+
+    strong {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+  }
+}
+
+.estado {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #e6f9ee;
+  color: #16a34a;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.boton-negro {
+  border: 0;
+  border-radius: 10px;
+  background: #0f1115;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 11px 22px;
+  cursor: pointer;
+
+  &:hover {
+    background: #1d2028;
+  }
+}
+
+// historial de movimientos 
+.titulo-seccion {
+  margin: 0 0 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.movimiento {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--ems-borde);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &__texto {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+
+    strong {
+      font-size: 0.78rem;
+    }
+
+    small {
+      font-size: 0.66rem;
+      color: var(--ems-texto-suave);
+    }
+  }
+
+  &__cantidad {
+    font-size: 0.78rem;
+    font-weight: 700;
+
+    &.verde {
+      color: #16a34a;
+    }
+
+    &.naranja {
+      color: #f59e0b;
+    }
+  }
+}
+
+.punto {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+
+  &.verde {
+    background: #16c26b;
+  }
+
+  &.naranja {
+    background: #f59e0b;
+  }
+}

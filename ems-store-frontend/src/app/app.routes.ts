@@ -8,6 +8,7 @@ import { Movimientos } from './movimientos/movimientos';
 import { Alertas } from './alertas/alertas';
 import { Reportes } from './reportes/reportes';
 import { Usuarios } from './usuarios/usuarios';
+import { DetalleProducto } from './inventario/detalle-producto/detalle-producto';
 
 export const routes: Routes = [
   { path: 'login', component: Login, title: 'Iniciar sesión | EMS Store' },
@@ -23,6 +24,7 @@ export const routes: Routes = [
       { path: 'alertas', component: Alertas, title: 'Alertas | EMS Store' },
       { path: 'reportes', component: Reportes, title: 'Reportes | EMS Store' },
       { path: 'usuarios', component: Usuarios, title: 'Gestión de Usuarios | EMS Store' },
+      { path: 'inventario/detalle/:id', component: DetalleProducto, title: 'Detalle del Producto | EMS Store' },
     ],
   },
   { path: '**', redirectTo: '' },
