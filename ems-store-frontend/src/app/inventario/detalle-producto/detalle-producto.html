@@ -1,0 +1,54 @@
+<div class="row g-3">
+  <!-- Ficha del producto -->
+  <div class="col-12 col-lg-8">
+    <section class="tarjeta ficha">
+      <div class="ficha__imagen"><i class="bi bi-bag"></i></div>
+
+      <div class="ficha__datos">
+        <span class="ficha__marca">{{ producto.marca }}</span>
+        <h2 class="ficha__nombre">{{ producto.nombre }}</h2>
+        <p class="ficha__sku">SKU: {{ producto.sku }} | Categoría: {{ producto.categoria }}</p>
+
+        <div class="ficha__atributos">
+          <div>
+            <small>Talla</small>
+            <strong>{{ producto.talla }}</strong>
+          </div>
+          <div>
+            <small>Color</small>
+            <strong>{{ producto.color }}</strong>
+          </div>
+          <div>
+            <small>Precio Comercial</small>
+            <strong class="verde">{{ producto.precio }}</strong>
+          </div>
+        </div>
+
+        <small class="ficha__etiqueta">Stock Disponible</small>
+        <div class="ficha__stock">
+          <strong>{{ producto.stock }}</strong>
+          <span class="estado">{{ producto.estado }}</span>
+        </div>
+
+        <button type="button" class="boton-negro">Editar Producto</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Historial -->
+  <div class="col-12 col-lg-4">
+    <section class="tarjeta">
+      <h3 class="titulo-seccion">Historial de Movimientos</h3>
+      @for (h of historial; track h.titulo + h.fecha) {
+        <div class="movimiento">
+          <span [class]="'punto ' + h.clase"></span>
+          <div class="movimiento__texto">
+            <strong>{{ h.titulo }}</strong>
+            <small>{{ h.fecha }}</small>
+          </div>
+          <strong [class]="'movimiento__cantidad ' + h.clase">{{ h.cantidad }}</strong>
+        </div>
+      }
+    </section>
+  </div>
+</div>

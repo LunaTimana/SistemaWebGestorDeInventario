@@ -1,0 +1,62 @@
+<section class="tarjeta selector">
+  <strong>Selector Temporal de Datos</strong>
+  <button type="button" class="filtro">
+    Rango: Este Año (2026) <i class="bi bi-calendar3"></i>
+  </button>
+</section>
+
+<div class="row g-3">
+  <!-- Reportes disponibles -->
+  <div class="col-12 col-lg-5 d-flex flex-column gap-3">
+    @for (r of reportes; track r.titulo) {
+      <article class="tarjeta reporte">
+        <h2 class="reporte__titulo"><i [class]="'bi ' + r.icono"></i> {{ r.titulo }}</h2>
+        <p class="reporte__descripcion">{{ r.descripcion }}</p>
+        <button type="button" [class]="r.principal ? 'boton-negro' : 'boton-claro'">{{ r.boton }}</button>
+      </article>
+    }
+  </div>
+
+  <!-- Previsualización -->
+  <div class="col-12 col-lg-7">
+    <section class="tarjeta">
+      <div class="previa__cabecera">
+        <h2>Previsualización: Valorización de Stock por Categoría</h2>
+        <small>Datos actualizados al momento</small>
+      </div>
+
+      @for (c of categorias; track c.nombre) {
+        <div class="categoria">
+          <div class="categoria__fila">
+            <strong>{{ c.nombre }}</strong>
+            <strong>{{ c.valor }} ({{ c.porcentaje }}%)</strong>
+          </div>
+          <div class="barra">
+            <div class="barra__relleno" [style.width.%]="c.porcentaje" [style.background]="c.color"></div>
+          </div>
+        </div>
+      }
+
+      <table class="tabla-previa">
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th>Items Totales</th>
+            <th>Precio Promedio</th>
+            <th>Valor Estimado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of detalle; track d.categoria) {
+            <tr>
+              <td class="fuerte">{{ d.categoria }}</td>
+              <td>{{ d.items }}</td>
+              <td>{{ d.promedio }}</td>
+              <td class="valor">{{ d.valor }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,85 @@
+<div class="row g-3 mb-3">
+  @for (k of kpis; track k.titulo) {
+    <div class="col-12 col-sm-6 col-xl-3">
+      <article class="tarjeta kpi h-100">
+        <div class="kpi__cabecera">
+          <span>{{ k.titulo }}</span>
+          <span [class]="'kpi__icono ' + k.tono"><i [class]="'bi ' + k.icono"></i></span>
+        </div>
+        <strong class="kpi__valor">{{ k.valor }}</strong>
+        <div class="kpi__pie">
+          <span [class]="'etiqueta ' + k.tonoEtiqueta">{{ k.etiqueta }}</span>
+          <span>{{ k.detalle }}</span>
+        </div>
+      </article>
+    </div>
+  }
+</div>
+<div class="row g-3">
+  <!-- Columna izquierda -->
+  <div class="col-12 col-lg-8 d-flex flex-column gap-3">
+    <section class="tarjeta">
+      <h2 class="titulo-seccion">Stock por Categoría</h2>
+      @for (c of categorias; track c.nombre) {
+        <div class="categoria">
+          <div class="categoria__fila">
+            <span>{{ c.nombre }}</span>
+            <span class="texto-suave">{{ c.unidades }} uds ({{ c.porcentaje }}%)</span>
+          </div>
+          <div class="barra">
+            <div class="barra__relleno" [style.width.%]="c.porcentaje" [style.background]="c.color"></div>
+          </div>
+        </div>
+      }
+    </section>
+
+    <section class="tarjeta">
+      <h2 class="titulo-seccion mb-1">Alertas Recientes de Stock Mínimo</h2>
+      <p class="texto-suave small mb-3">Artículos que están por debajo del límite de seguridad.</p>
+      @for (a of alertas; track a.sku) {
+        <div class="alerta-fila">
+          <div>
+            <strong>{{ a.producto }}</strong>
+            <div class="texto-suave small">SKU: {{ a.sku }} | Talla: {{ a.talla }}</div>
+          </div>
+          <div class="alerta-fila__stock small">
+            <span>Stock: <b class="critico">{{ a.stock }}</b></span>
+            <span class="texto-suave">Mín: {{ a.minimo }}</span>
+          </div>
+        </div>
+      }
+    </section>
+  </div>
+
+    <!-- Columna derecha -->
+  <div class="col-12 col-lg-4 d-flex flex-column gap-3">
+    <section class="tarjeta">
+      <h2 class="titulo-seccion">Accesos Rápidos</h2>
+      <div class="d-flex flex-column gap-2">
+        <a class="acceso" routerLink="/registrar-producto">
+          <span class="acceso__icono"><i class="bi bi-plus-lg"></i></span>
+          <span class="flex-grow-1">Registrar Nuevo Producto</span>
+          <i class="bi bi-chevron-right texto-suave"></i>
+        </a>
+        <a class="acceso" routerLink="/movimientos">
+          <span class="acceso__icono"><i class="bi bi-arrow-left-right"></i></span>
+          <span class="flex-grow-1">Entradas / Salidas de Stock</span>
+          <i class="bi bi-chevron-right texto-suave"></i>
+        </a>
+      </div>
+    </section>
+
+    <section class="tarjeta">
+      <h2 class="titulo-seccion">Transacciones Recientes</h2>
+      @for (t of transacciones; track t.titulo) {
+        <div class="transaccion">
+          <span class="transaccion__punto" [style.background]="t.color"></span>
+          <div>
+            <strong class="small">{{ t.titulo }}</strong>
+            <div class="texto-suave small">{{ t.detalle }}</div>
+          </div>
+        </div>
+      }
+    </section>
+  </div>
+</div>

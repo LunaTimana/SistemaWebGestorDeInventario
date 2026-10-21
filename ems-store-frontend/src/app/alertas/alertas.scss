@@ -1,0 +1,176 @@
+// resumen y botones 
+.resumen {
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--ems-texto-suave);
+  }
+
+  &__valor {
+    display: block;
+    font-size: 1.7rem;
+    font-weight: 800;
+    margin-top: 12px;
+
+    &.rojo {
+      color: #dc2626;
+    }
+
+    &.naranja {
+      color: #f59e0b;
+    }
+
+    &.neutro {
+      color: var(--ems-texto);
+    }
+  }
+}
+
+.punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  &.rojo {
+    background: #ef4444;
+  }
+
+  &.naranja {
+    background: #f59e0b;
+  }
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.chip {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  cursor: pointer;
+
+  &.activo {
+    background: #0f1115;
+    color: #fff;
+  }
+
+  &.rojo {
+    background: #fff5f5;
+    border-color: #fbd5d5;
+    color: #dc2626;
+
+    &:hover {
+      background: #fdecec;
+    }
+  }
+
+  &.naranja {
+    background: #fffaf0;
+    border-color: #fde3b5;
+    color: #d97706;
+
+    &:hover {
+      background: #fff3e0;
+    }
+  }
+}
+
+// tablas, etiquetas de estado y boton
+.tabla-tarjeta {
+  padding: 0;
+  overflow: hidden;
+  min-height: 460px;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+
+  thead {
+    background: var(--ems-panel);
+  }
+
+  th {
+    padding: 12px 14px;
+    font-size: 0.66rem;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    color: #9ca3af;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--ems-borde);
+    white-space: nowrap;
+  }
+
+  tbody tr:hover {
+    background: #fafbfc;
+  }
+}
+
+.fuerte {
+  font-weight: 700;
+}
+
+.suave {
+  color: var(--ems-texto-suave);
+  font-weight: 500;
+}
+
+.deficit {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.estado {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.64rem;
+  font-weight: 700;
+
+  &.rojo {
+    background: #fdecec;
+    color: #dc2626;
+  }
+
+  &.naranja {
+    background: #fff3e0;
+    color: #d97706;
+  }
+}
+
+.boton-lima {
+  border: 0;
+  border-radius: 6px;
+  background: var(--ems-lime);
+  color: #000;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+} 
