@@ -1,0 +1,91 @@
+<div class="row g-3">
+  <!-- Formulario -->
+  <div class="col-12 col-lg-8">
+    <form class="tarjeta">
+      <h2 class="titulo-formulario">Nueva Operación de Salida</h2>
+
+      <div class="row g-3">
+        <div class="col-12">
+          <label for="producto">Seleccionar Producto *</label>
+          <select id="producto">
+            @for (p of productos; track p) {
+              <option>{{ p }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label for="cantidad">Cantidad a Retirar *</label>
+          <input id="cantidad" type="number" min="1" [value]="cantidad" [class.invalido]="hayError" />
+        </div>
+        <div class="col-12 col-md-6">
+          <label for="tipo">Tipo de Salida *</label>
+          <select id="tipo">
+            @for (t of tiposSalida; track t) {
+              <option>{{ t }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label for="destino">Destino / Origen *</label>
+          <input id="destino" type="text" value="Caja Principal - Sucursal Oriente" />
+        </div>
+        <div class="col-12 col-md-6">
+          <label for="documento">Número de Documento *</label>
+          <input id="documento" type="text" value="Boleta #F4920" />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label for="fecha">Fecha de Operación</label>
+          <input id="fecha" type="text" [value]="fecha" readonly />
+        </div>
+        <div class="col-12 col-md-6">
+          <label for="responsable">Responsable *</label>
+          <select id="responsable">
+            @for (r of responsables; track r) {
+              <option>{{ r }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label for="notas">Comentario / Notas (Opcional)</label>
+          <textarea id="notas" rows="3">Venta directa de calzado en caja.</textarea>
+        </div>
+      </div>
+
+      <div class="acciones-formulario">
+        <button type="button" class="boton-lima">Registrar Salida</button>
+        <a class="boton-claro" routerLink="/movimientos">Cancelar</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Resumen de proyección -->
+  <div class="col-12 col-lg-4 d-flex flex-column gap-3">
+    <section class="tarjeta">
+      <h3 class="titulo-formulario">Resumen de Proyección</h3>
+
+      <div class="proyeccion">
+        <small>Stock Actual del Producto</small>
+        <strong>{{ stockActual }} unidades</strong>
+      </div>
+
+      <div class="proyeccion" [class.proyeccion--error]="hayError" [class.proyeccion--verde]="!hayError">
+        <small>Stock Proyectado (Post-Salida)</small>
+        <strong>{{ proyectado }} unidades</strong>
+      </div>
+    </section>
+
+    @if (hayError) {
+      <div class="alerta-error" role="alert">
+        <i class="bi bi-exclamation-circle"></i>
+        <div>
+          <strong>Stock Insuficiente</strong>
+          <p>La cantidad ingresada supera el inventario disponible. Revise el stock e intente de nuevo.</p>
+        </div>
+      </div>
+    }
+  </div>
+</div>

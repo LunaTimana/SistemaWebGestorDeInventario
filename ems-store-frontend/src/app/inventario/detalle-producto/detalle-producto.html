@@ -30,7 +30,7 @@
           <span class="estado">{{ producto.estado }}</span>
         </div>
 
-        <button type="button" class="boton-negro">Editar Producto</button>
+        <a class="boton-negro" [routerLink]="['/inventario/editar', producto.sku]">Editar Producto</a>
       </div>
     </section>
   </div>

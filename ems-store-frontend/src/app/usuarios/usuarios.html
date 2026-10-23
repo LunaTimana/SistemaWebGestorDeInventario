@@ -3,7 +3,7 @@
   <div class="col-12 col-lg-8">
     <h2 class="titulo-seccion">Usuarios Registrados</h2>
 
-    <section class="tarjeta tabla-tarjeta">
+    <section class="tarjeta tabla-tarjeta mb-3">
       <div class="tabla-scroll">
         <table class="tabla">
           <thead>
@@ -13,11 +13,12 @@
               <th>Rol</th>
               <th>Estado</th>
               <th>Última Conexión</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             @for (u of usuarios; track u.correo) {
-              <tr>
+              <tr [class.seleccionada]="u === seleccionado">
                 <td class="fuerte">{{ u.nombre }}</td>
                 <td class="suave">{{ u.correo }}</td>
                 <td><span [class]="'rol ' + u.claseRol">{{ u.rol }}</span></td>
@@ -27,13 +28,46 @@
                   </span>
                 </td>
                 <td class="suave">{{ u.conexion }}</td>
-              </tr>
+                <td class="acciones">
+                  <button type="button" class="accion accion--editar">Editar rol</button>
+                  <button type="button" class="accion accion--desactivar">Desactivar</button>
+                </td>
+              </tr>       
             }
           </tbody>
         </table>
       </div>
     </section>
+        <section class="tarjeta editar-rol">
+      <h2 class="titulo-formulario">Editar Rol</h2>
+      <p class="subtitulo">Cambia el rol de un usuario existente sin salir de esta pantalla.</p>
+
+      <span class="etiqueta">Usuario seleccionado</span>
+      <div class="usuario-seleccionado">
+        <strong>{{ seleccionado.nombre }}</strong>
+        <small>{{ seleccionado.correo }}</small>
+      </div>
+
+      <span class="etiqueta">Rol actual</span>
+      <span [class]="'rol ' + seleccionado.claseRol">{{ seleccionado.rol }}</span>
+
+      <label for="nuevo-rol">Nuevo rol</label>
+      <select id="nuevo-rol">
+        @for (r of rolesDisponibles; track r) {
+          <option [selected]="r === nuevoRol">{{ r }}</option>
+        }
+      </select>
+
+      <div class="confirmacion">
+        <small>Confirmación</small>
+        <p>El cambio se aplicará solo al usuario seleccionado y no afectará su correo ni su estado actual.</p>
+      </div>
+
+      <button type="button" class="boton-lima">Confirmar cambio de rol</button>
+      <button type="button" class="boton-borde">Cancelar</button>
+    </section>
   </div>
+
 
   <!-- Nuevo usuario -->
   <div class="col-12 col-lg-4">
@@ -62,3 +96,4 @@
     </form>
   </div>
 </div>
+

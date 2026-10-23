@@ -30,4 +30,8 @@ export interface Subpantalla {
 
 export const SUBPANTALLAS: Subpantalla[] = [
   { prefijo: '/inventario/detalle', titulo: 'Detalle', encabezado: 'Detalle del Producto' },
+  { prefijo: '/inventario/editar', titulo: 'Detalle / Editar', encabezado: 'Editar Producto' },
+  { prefijo: '/movimientos/entrada', titulo: 'Entrada Stock', encabezado: 'Registrar Entrada de Stock' },
+  { prefijo: '/movimientos/salida', titulo: 'Salida Stock', encabezado: 'Registrar Salida de Stock' },
+  { prefijo: '/configuracion', titulo: 'Configuración / Mi cuenta', encabezado: 'Configuración de cuenta' },
 ];

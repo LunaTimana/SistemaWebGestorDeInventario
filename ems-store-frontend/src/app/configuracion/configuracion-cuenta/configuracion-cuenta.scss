@@ -1,0 +1,215 @@
+// formulario, campos de contraseña y botones
+.titulo-formulario {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.subtitulo {
+  margin: 0 0 16px;
+  font-size: 0.75rem;
+  color: var(--ems-texto-suave);
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ems-texto);
+}
+
+input[type='text'],
+input[type='password'] {
+  width: 100%;
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ems-texto);
+  font-family: inherit;
+  font-size: 0.78rem;
+  padding: 10px 12px;
+  outline: none;
+
+  &:focus {
+    border-color: #0f1115;
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+}
+
+.ayuda {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.68rem;
+  color: var(--ems-texto-suave);
+}
+
+.separador {
+  margin: 22px 0;
+  border: 0;
+  border-top: 1px solid var(--ems-borde);
+  opacity: 1;
+}
+
+.campo-clave {
+  position: relative;
+
+  input {
+    padding-right: 40px;
+  }
+
+  button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 0;
+    background: none;
+    color: var(--ems-texto-suave);
+    font-size: 0.95rem;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--ems-texto);
+    }
+  }
+}
+
+.acciones-formulario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.boton-lima,
+.boton-claro {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.boton-lima {
+  border: 0;
+  background: var(--ems-lime);
+  color: #000;
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+}
+
+.boton-claro {
+  border: 1px solid #e3e6ea;
+  background: #fff;
+  color: var(--ems-texto);
+  font-weight: 600;
+
+  &:hover {
+    background: #f3f4f6;
+    color: var(--ems-texto);
+  }
+}
+
+//tarjeta de mi cuenta y aviso de protección de datos
+.perfil {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  &__texto {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+
+    strong {
+      font-size: 0.9rem;
+    }
+
+    small {
+      font-size: 0.7rem;
+      color: var(--ems-texto-suave);
+    }
+  }
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #1f3b4d;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.dato {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f3f4f6;
+
+  small {
+    font-size: 0.68rem;
+    color: var(--ems-texto-suave);
+  }
+
+  strong {
+    font-size: 0.8rem;
+  }
+}
+
+.nota {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 0;
+  font-size: 0.7rem;
+  color: var(--ems-texto-suave);
+
+  i {
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+}
+
+.consejo {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  &__icono {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: var(--ems-lime-suave);
+    color: #4d7c0f;
+  }
+
+  strong {
+    font-size: 0.8rem;
+  }
+
+  p {
+    margin: 4px 0 0;
+    font-size: 0.72rem;
+    color: var(--ems-texto-suave);
+  }
+}

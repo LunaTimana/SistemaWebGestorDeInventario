@@ -1,0 +1,70 @@
+<div class="row g-3">
+  <!-- Formulario -->
+  <div class="col-12 col-lg-8">
+    <form class="tarjeta">
+      <h2 class="titulo-formulario">Nueva Operación de Entrada</h2>
+
+      <div class="row g-3">
+        <div class="col-12">
+          <label for="producto">Seleccionar Producto *</label>
+          <select id="producto">
+            @for (p of productos; track p) {
+              <option>{{ p }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label for="cantidad">Cantidad a Ingresar *</label>
+          <input id="cantidad" type="number" min="1" value="45" />
+        </div>
+        <div class="col-12 col-md-6">
+          <label for="proveedor">Proveedor *</label>
+          <select id="proveedor">
+            @for (p of proveedores; track p) {
+              <option>{{ p }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label for="fecha">Fecha de Operación</label>
+          <input id="fecha" type="text" [value]="fecha" readonly />
+        </div>
+        <div class="col-12 col-md-6">
+          <label for="responsable">Responsable *</label>
+          <select id="responsable">
+            @for (r of responsables; track r) {
+              <option>{{ r }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label for="notas">Comentario / Notas Adicionales</label>
+          <textarea id="notas" rows="3">Ingreso de lote para campaña de fin de año. Todo en óptimas condiciones.</textarea>
+        </div>
+      </div>
+
+      <div class="acciones-formulario">
+        <button type="button" class="boton-lima">Registrar Entrada</button>
+        <a class="boton-claro" routerLink="/movimientos">Cancelar</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Resumen de proyección -->
+  <div class="col-12 col-lg-4">
+    <section class="tarjeta">
+      <h3 class="titulo-formulario">Resumen de Proyección</h3>
+      <div class="proyeccion">
+        <small>Stock Actual del Producto</small>
+        <strong>{{ resumen.actual }}</strong>
+      </div>
+      <div class="proyeccion proyeccion--verde">
+        <small>Stock Proyectado (Post-ingreso)</small>
+        <strong>{{ resumen.proyectado }}</strong>
+      </div>
+    </section>
+  </div>
+</div>

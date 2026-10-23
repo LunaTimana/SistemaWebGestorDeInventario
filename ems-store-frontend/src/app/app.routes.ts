@@ -9,6 +9,9 @@ import { Alertas } from './alertas/alertas';
 import { Reportes } from './reportes/reportes';
 import { Usuarios } from './usuarios/usuarios';
 import { DetalleProducto } from './inventario/detalle-producto/detalle-producto';
+import { RegistrarEntrada } from './movimientos/registrar-entrada/registrar-entrada';
+import { RegistrarSalida } from './movimientos/registrar-salida/registrar-salida';
+import { ConfiguracionCuenta } from './configuracion/configuracion-cuenta/configuracion-cuenta';
 
 export const routes: Routes = [
   { path: 'login', component: Login, title: 'Iniciar sesión | EMS Store' },
@@ -25,6 +28,10 @@ export const routes: Routes = [
       { path: 'reportes', component: Reportes, title: 'Reportes | EMS Store' },
       { path: 'usuarios', component: Usuarios, title: 'Gestión de Usuarios | EMS Store' },
       { path: 'inventario/detalle/:id', component: DetalleProducto, title: 'Detalle del Producto | EMS Store' },
+      { path: 'inventario/editar/:sku', component: RegistrarProducto, title: 'Editar producto | EMS Store' },
+      { path: 'movimientos/entrada', component: RegistrarEntrada, title: 'Registrar entrada de stock | EMS Store' },
+      { path: 'movimientos/salida', component: RegistrarSalida, title: 'Registrar salida de stock | EMS Store' },
+      { path: 'configuracion', component: ConfiguracionCuenta, title: 'Configuración de cuenta | EMS Store' },
     ],
   },
   { path: '**', redirectTo: '' },

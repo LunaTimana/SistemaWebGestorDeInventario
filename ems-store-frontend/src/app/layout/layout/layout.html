@@ -37,9 +37,12 @@
         </button>
         <div>
           <div class="topbar__ruta">
-            EMS Store / {{ actual()?.titulo }}
+            EMS Store
+            @if (actual(); as a) {
+              / {{ a.titulo }}
+            }
             @if (subpantalla(); as s) {
-            / {{ s.titulo }}
+              / {{ s.titulo }}
             }
           </div>
           <h1>{{ encabezado() }}</h1>
@@ -48,9 +51,9 @@
 
       <div class="topbar__acciones">
         <span class="chip-sucursal d-none d-md-inline-flex">{{ sucursal }}</span>
-        <button type="button" class="btn-config" aria-label="Configuración">
+        <a class="btn-config" routerLink="/configuracion" routerLinkActive="activo" aria-label="Configuración">
           <i class="bi bi-gear"></i>
-        </button>
+        </a>
       </div>
     </header>
 

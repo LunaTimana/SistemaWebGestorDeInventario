@@ -15,4 +15,9 @@ export class Usuarios {
     { nombre: 'Luz Benitez', correo: 'lbenitez@emsstore.com', rol: 'Ventas', claseRol: 'ventas', estado: 'Activo', claseEstado: 'activo', conexion: 'Ayer, 18:22' },
     { nombre: 'Juan Sanchez', correo: 'jsanchez@emsstore.com', rol: 'Almacén', claseRol: 'almacen', estado: 'Inactivo', claseEstado: 'inactivo', conexion: 'Hace 5 días' },
   ];
+
+  // Usuario elegido en el panel "Editar Rol" (en el prototipo es el segundo)
+  seleccionado = this.usuarios[1];
+  rolesDisponibles = ['Administrador', 'Almacén', 'Ventas'];
+  nuevoRol = 'Ventas';
 }

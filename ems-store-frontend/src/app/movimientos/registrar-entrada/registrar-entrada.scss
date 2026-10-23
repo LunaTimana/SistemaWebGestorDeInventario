@@ -1,0 +1,119 @@
+//formulario y botones
+.titulo-formulario {
+  margin: 0 0 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ems-texto);
+}
+
+input[type='text'],
+input[type='number'],
+select,
+textarea {
+  width: 100%;
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ems-texto);
+  font-family: inherit;
+  font-size: 0.78rem;
+  padding: 9px 10px;
+  outline: none;
+
+  &:focus {
+    border-color: #0f1115;
+  }
+
+  &[readonly] {
+    background: #eef0f3;
+    color: var(--ems-texto-suave);
+  }
+}
+
+textarea {
+  resize: vertical;
+  color: var(--ems-texto-suave);
+}
+
+.acciones-formulario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.boton-lima,
+.boton-claro {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 10px 22px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.boton-lima {
+  border: 0;
+  background: var(--ems-lime);
+  color: #000;
+
+  &:hover {
+    filter: brightness(0.92);
+  }
+}
+
+.boton-claro {
+  border: 1px solid #e3e6ea;
+  background: #fff;
+  color: var(--ems-texto);
+  font-weight: 600;
+
+  &:hover {
+    background: #f3f4f6;
+    color: var(--ems-texto);
+  }
+}
+
+// tarjeta de resumen de proyección
+.proyeccion {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f3f4f6;
+
+  small {
+    font-size: 0.68rem;
+    color: var(--ems-texto-suave);
+  }
+
+  strong {
+    font-size: 1.2rem;
+    font-weight: 800;
+  }
+
+  &--verde {
+    margin-bottom: 0;
+    background: #e6f9ee;
+
+    small {
+      color: #4b8a67;
+    }
+
+    strong {
+      color: #16a34a;
+    }
+  }
+}

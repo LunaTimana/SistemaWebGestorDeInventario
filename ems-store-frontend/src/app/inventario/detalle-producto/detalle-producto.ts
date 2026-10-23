@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 // Datos de ejemplo tomados del prototipo de Figma.
 // Cuando exista la API, se buscan por el SKU de la ruta.
 @Component({
   selector: 'app-detalle-producto',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './detalle-producto.html',
   styleUrl: './detalle-producto.scss',
 })

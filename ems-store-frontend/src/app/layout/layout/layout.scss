@@ -206,6 +206,16 @@
   cursor: pointer;
 }
 
+.btn-config {
+  text-decoration: none;
+
+  &.activo {
+    background: var(--ems-lime-suave);
+    color: #0f1115;
+    box-shadow: inset 0 0 0 1px rgba(180, 255, 0, 0.5);
+  }
+}
+
 .contenido {
   padding: 24px 28px;
 }

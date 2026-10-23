@@ -1,0 +1,101 @@
+<div class="row g-3">
+  <!-- Formulario -->
+  <div class="col-12 col-lg-8">
+    <form class="tarjeta">
+      <h2 class="titulo-formulario">Datos personales</h2>
+      <p class="subtitulo">Revisa y actualiza la información de tu cuenta.</p>
+
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <label for="nombre">Nombre *</label>
+          <input id="nombre" type="text" [value]="usuario.nombre" />
+        </div>
+        <div class="col-12 col-md-6">
+          <label for="apellido">Apellido *</label>
+          <input id="apellido" type="text" [value]="usuario.apellido" />
+        </div>
+        <div class="col-12">
+          <label for="correo">Correo electrónico</label>
+          <input id="correo" type="text" placeholder="Ingresa tu correo electrónico" />
+          <small class="ayuda">Usa un correo al que tengas acceso.</small>
+        </div>
+      </div>
+
+      <hr class="separador" />
+
+      <h2 class="titulo-formulario">Cambiar contraseña</h2>
+      <p class="subtitulo">Deja estos campos vacíos si no deseas cambiar tu contraseña.</p>
+
+      <div class="row g-3">
+        <div class="col-12">
+          <label for="actual">Contraseña actual</label>
+          <div class="campo-clave">
+            <input id="actual" type="password" placeholder="Ingresa tu contraseña actual" />
+            <button type="button" aria-label="Mostrar contraseña"><i class="bi bi-eye-slash"></i></button>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <label for="nueva">Nueva contraseña</label>
+          <div class="campo-clave">
+            <input id="nueva" type="password" placeholder="Ingresa una nueva contraseña" />
+            <button type="button" aria-label="Mostrar contraseña"><i class="bi bi-eye-slash"></i></button>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <label for="confirmar">Confirmar nueva contraseña</label>
+          <div class="campo-clave">
+            <input id="confirmar" type="password" placeholder="Repite la nueva contraseña" />
+            <button type="button" aria-label="Mostrar contraseña"><i class="bi bi-eye-slash"></i></button>
+          </div>
+        </div>
+        <div class="col-12">
+          <small class="ayuda">Usa al menos 8 caracteres, una mayúscula, una minúscula y un número.</small>
+        </div>
+      </div>
+
+      <hr class="separador" />
+
+      <div class="acciones-formulario">
+        <button type="button" class="boton-lima">Guardar cambios</button>
+        <a class="boton-claro" routerLink="/dashboard">Cancelar</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Columna derecha -->
+  <div class="col-12 col-lg-4 d-flex flex-column gap-3">
+    <section class="tarjeta">
+      <h3 class="titulo-formulario">Mi cuenta</h3>
+
+      <div class="perfil">
+        <span class="avatar">{{ usuario.iniciales }}</span>
+        <div class="perfil__texto">
+          <strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong>
+          <small>EMS Store</small>
+        </div>
+      </div>
+
+      <div class="dato">
+        <small>Rol asignado</small>
+        <strong>{{ usuario.rol }}</strong>
+      </div>
+      <div class="dato">
+        <small>Sucursal</small>
+        <strong>{{ usuario.sucursal }}</strong>
+      </div>
+
+      <p class="nota">
+        <i class="bi bi-lock"></i>
+        El rol y la sucursal son administrados desde Gestión de Usuarios.
+      </p>
+    </section>
+
+    <section class="tarjeta consejo">
+      <span class="consejo__icono"><i class="bi bi-shield-check"></i></span>
+      <div>
+        <strong>Protege tu cuenta</strong>
+        <p>Elige una contraseña única y no la compartas. Evita usar tu nombre o datos fáciles de adivinar.</p>
+      </div>
+    </section>
+  </div>
+</div>

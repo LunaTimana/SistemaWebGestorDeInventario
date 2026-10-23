@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 // Datos de ejemplo tomados del prototipo de Figma.
 // Cuando exista la API, se reemplazan por un servicio con HttpClient.
 @Component({
   selector: 'app-movimientos',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './movimientos.html',
   styleUrl: './movimientos.scss',
 })

@@ -56,7 +56,7 @@
             <td class="precio">S/ {{ p.precio.toFixed(2) }}</td>
             <td><span [class]="'estado ' + p.claseEstado">{{ p.estado }}</span></td>
             <td class="acciones">
-              <button type="button" aria-label="Editar producto"><i class="bi bi-pencil"></i></button>
+              <a [routerLink]="['/inventario/editar', p.sku]" aria-label="Editar producto"><i class="bi bi-pencil"></i></a>
               <a [routerLink]="['/inventario/detalle', p.sku]" aria-label="Ver detalle"><i class="bi bi-eye"></i></a>
             </td>
           </tr>
