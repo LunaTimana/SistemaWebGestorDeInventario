@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { MENU, SUBPANTALLAS } from '../../core/menu';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -12,6 +13,7 @@ import { MENU, SUBPANTALLAS } from '../../core/menu';
 })
 export class Layout {
   private router = inject(Router);
+  private auth = inject(AuthService);
 
   menu = MENU;
   sucursal = 'Sucursal Principal';
@@ -31,4 +33,8 @@ export class Layout {
   // Si la pantalla es una subpantalla (por ejemplo, el detalle de un producto)
   subpantalla = computed(() => SUBPANTALLAS.find((s) => this.url().startsWith(s.prefijo)));
   encabezado = computed(() => this.subpantalla()?.encabezado ?? this.actual()?.encabezado);
+
+  cerrarSesion(): void {
+    this.auth.logout();
+  }
 }

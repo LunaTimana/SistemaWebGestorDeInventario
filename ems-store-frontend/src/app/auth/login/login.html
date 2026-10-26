@@ -2,21 +2,26 @@
   <img class="login__logo" src="logoEMS.png" alt="EMS Store" />
 
   <section class="login__tarjeta">
-    <h1>Iniciar Sesión</h1>
+    <h1>Iniciar sesión</h1>
 
-    <form>
-      <label for="usuario">Usuario o Correo Electrónico</label>
-      <input id="usuario" type="text" placeholder="admin@emsstore.com" />
+    <form (ngSubmit)="ingresar()">
+      <label for="usuario">Correo electrónico</label>
+      <input id="usuario" name="correo" type="email" placeholder="admin@emsstore.com"
+        [(ngModel)]="correo" autocomplete="username" required />
 
       <label for="clave">Contraseña</label>
       <div class="campo-clave">
-        <input id="clave" type="password" placeholder="••••••••" />
-        <button type="button" class="campo-clave__ver">MOSTRAR</button>
+        <input id="clave" name="contrasena" [type]="mostrarContrasena ? 'text' : 'password'"
+          placeholder="••••••••" [(ngModel)]="contrasena" autocomplete="current-password" required />
+        <button type="button" class="campo-clave__ver" (click)="mostrarContrasena = !mostrarContrasena">
+          {{ mostrarContrasena ? 'OCULTAR' : 'MOSTRAR' }}
+        </button>
       </div>
 
-      <button type="submit" class="login__boton">Ingresar al Sistema</button>
+      <p class="login__error" role="alert" *ngIf="error">{{ error }}</p>
+      <button type="submit" class="login__boton" [disabled]="cargando || !correo || !contrasena">
+        {{ cargando ? 'Ingresando…' : 'Ingresar al Sistema' }}
+      </button>
     </form>
-
-    <span class="login__olvido">¿Olvidaste tu contraseña?</span>
   </section>
 </main>

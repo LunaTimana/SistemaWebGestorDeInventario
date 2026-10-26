@@ -12,12 +12,14 @@ import { DetalleProducto } from './inventario/detalle-producto/detalle-producto'
 import { RegistrarEntrada } from './movimientos/registrar-entrada/registrar-entrada';
 import { RegistrarSalida } from './movimientos/registrar-salida/registrar-salida';
 import { ConfiguracionCuenta } from './configuracion/configuracion-cuenta/configuracion-cuenta';
+import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: Login, title: 'Iniciar sesión | EMS Store' },
   {
     path: '',
     component: Layout,
+    canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       { path: 'dashboard', component: Dashboard, title: 'Dashboard | EMS Store' },

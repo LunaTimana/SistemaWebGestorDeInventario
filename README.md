@@ -1,4 +1,68 @@
 # SistemaWebGestorDeInventario
+
+## Ejecución local en Windows
+
+Requisitos: MySQL 8.0.16 o superior, Java 21 y Node.js/npm. Mantén MySQL en ejecución mientras uses el sistema.
+
+1. En MySQL Workbench, abre y ejecuta `DB_EMS_Prueba1.sql`. El script crea la base `ems_store`, sus tablas y datos de ejemplo. Si ya tienes el esquema creado, no vuelvas a ejecutar el script completo.
+2. Abre una primera ventana de PowerShell en la carpeta del proyecto y ejecuta:
+
+   ```powershell
+   $env:DB_USERNAME = "root"
+   $env:DB_PASSWORD = "tucontraseña"
+   $jwtBytes = [byte[]]::new(32)
+   [Security.Cryptography.RandomNumberGenerator]::Fill($jwtBytes)
+   $env:JWT_SECRET = [Convert]::ToBase64String($jwtBytes)
+   Set-Location .\backend
+   .\mvnw.cmd spring-boot:run
+   ```
+
+   Deja esta ventana abierta. El backend debe indicar que arrancó en el puerto **8083**. La conexión predeterminada es `localhost:3306/ems_store`; `DB_URL` permite cambiarla. Hibernate valida el esquema existente y no crea ni modifica tablas.
+3. Abre una segunda ventana de PowerShell en la carpeta del proyecto y ejecuta:
+
+   ```powershell
+   Set-Location .\ems-store-frontend
+   npm start
+   ```
+
+   Abre la dirección que muestre Angular (normalmente `http://localhost:4200`). El proxy de desarrollo reenvía `/api` a `http://localhost:8083`; abre el frontend mediante Angular, no como archivo local ni con otro servidor.
+4. Inicia sesión con `admin@emsstore.com` y `admin123` (cuenta local de demostración).
+
+Para confirmar el backend desde otra ventana de PowerShell, prueba el login directamente:
+
+```powershell
+$body = @{ correo = "admin@emsstore.com"; contrasena = "admin123" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://localhost:8083/api/auth/login -ContentType "application/json" -Body $body
+```
+
+Si esta petición falla, revisa primero la ventana del backend, las credenciales de MySQL y que `DB_EMS_Prueba1.sql` se haya ejecutado. Si responde con un token, pero la pantalla no entra, revisa que Angular se haya iniciado con `npm start` en el puerto 4200 y recarga la página.
+
+Las variables definidas con `$env:` solo viven en esa ventana de PowerShell. Si abres una nueva, vuelve a definirlas antes de iniciar el backend. `JWT_SECRET` debe ser una clave Base64 de al menos 32 bytes; el bloque de arriba genera una al azar.
+
+Para ejecutar las pruebas del backend (usan H2 en memoria y no requieren MySQL):
+
+```powershell
+Set-Location .\backend
+.\mvnw.cmd test
+```
+
+Apache POI (`poi-ooxml`) está configurado en Maven para leer archivos `.xlsx`. La API de importación es `POST http://localhost:8083/api/importaciones/stock` con `multipart/form-data`: campo `archivo` requerido, `confirmar` opcional (por defecto `false`) y `responsableId` requerido al confirmar la importación.
+
+## Seguridad (RNF01)
+
+- El inicio de sesión es `POST /api/auth/login`, JSON `{ "correo": "...", "contrasena": "..." }`. Devuelve un JWT Bearer válido por 1 hora y los datos del usuario. Las demás rutas `/api/**` requieren `Authorization: Bearer <token>`.
+- `GET /api/usuarios/**` es exclusivo de Administrador. Registrar productos e importar stock requiere Administrador o Almacén. Las cuentas inactivas no pueden iniciar sesión. Las contraseñas de la tabla `usuarios` se verifican con BCrypt. El SQL incluye cuentas de demo activas con contraseña `admin123`; cambia sus claves antes de desplegar o exponer la base.
+- La cuenta de administrador de demostración inicia con `admin@emsstore.com` y contraseña `admin123`. Si ya habías creado la base de datos con una versión anterior del script, actualiza el correo en MySQL: `UPDATE usuarios SET correo = 'admin@emsstore.com' WHERE correo = 'mmorales@emsstore.com';`.
+- Genera una clave JWT distinta por ambiente y no la subas al repositorio:
+
+  ```powershell
+  $jwtBytes = [byte[]]::new(32)
+  [Security.Cryptography.RandomNumberGenerator]::Fill($jwtBytes)
+  $env:JWT_SECRET = [Convert]::ToBase64String($jwtBytes)
+  ```
+
+- En producción inicia con el perfil `prod` y define `TLS_KEY_STORE`, `TLS_KEY_STORE_PASSWORD`, `TLS_KEY_ALIAS` y `CORS_ALLOWED_ORIGIN`. El almacén debe ser PKCS12 y contener un certificado válido para el dominio. El backend escuchará por HTTPS en el puerto 8443. Configura Angular detrás del mismo dominio con `/api` dirigido al backend; en desarrollo `npm start` usa el proxy local HTTP.
+- Angular guarda el token en `sessionStorage`, añade el encabezado Bearer y lleva al login si no hay una sesión válida. Cierra la pestaña para eliminar la sesión.
 Desarrollo de un sistema administrativo web que permita catalogar productos, controlar en tiempo real las entradas y salidas de inventario, generar alertas de stock mínimo, anticipar la demanda y emitir reportes gerenciales de ventas y rotación.  
 
 ## Resumen de tecnologías y librerías: EMS Store

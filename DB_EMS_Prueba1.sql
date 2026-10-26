@@ -206,13 +206,12 @@ INSERT INTO roles (id, nombre) VALUES
     (2, 'Almacén'),
     (3, 'Ventas');
 
--- IMPORTANTE: reemplaza este valor por un hash BCrypt real antes de probar
--- el login. Genéralo con BCryptPasswordEncoder de Spring (por ejemplo, para
--- la contraseña "admin123") y pégalo aquí; se usa para los 4 usuarios de prueba.
-SET @hash_demo = '$2a$10$REEMPLAZAR_POR_HASH_BCRYPT_REAL';
+-- SOLO DEMO LOCAL: los usuarios activos de ejemplo comparten la clave admin123.
+-- Reemplaza el hash antes de desplegar o exponer esta base de datos.
+SET @hash_demo = '$2a$10$7dPScLhBuKjGVwO1hztAxuxu0BJ9grwnfeMQM02OcUEtD3P/V5HQy';
 
 INSERT INTO usuarios (id, nombre, apellido, correo, contrasena_hash, debe_cambiar_contrasena, rol_id, estado, ultima_conexion) VALUES
-    (1, 'Marcio', 'Morales', 'mmorales@emsstore.com', @hash_demo, FALSE, 1, 'activo',   '2026-10-22 15:45:00'),
+    (1, 'Marcio', 'Morales', 'admin@emsstore.com', @hash_demo, FALSE, 1, 'activo',   '2026-10-22 15:45:00'),
     (2, 'Carlos', 'Mendoza', 'cmendoza@emsstore.com', @hash_demo, FALSE, 2, 'activo',   '2026-10-22 08:30:00'),
     (3, 'Luz',    'Benitez', 'lbenitez@emsstore.com', @hash_demo, FALSE, 3, 'activo',   '2026-10-21 18:22:00'),
     (4, 'Juan',   'Sanchez', 'jsanchez@emsstore.com', @hash_demo, FALSE, 2, 'inactivo', '2026-10-17 10:00:00');
