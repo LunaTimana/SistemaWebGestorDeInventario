@@ -1,8 +1,4 @@
 package com.emsstore.backend.repository;
-
+import com.emsstore.backend.entity.Proveedor;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.emsstore.backend.model.Proveedor;
-
-public interface ProveedorRepository extends JpaRepository<Proveedor, Integer> {
-}
+public interface ProveedorRepository extends JpaRepository<Proveedor,Integer> {}

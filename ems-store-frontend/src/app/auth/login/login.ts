@@ -1,40 +1,50 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 import { AuthService } from '../auth.service';
 
 @Component({
-  imports: [CommonModule, FormsModule],
   selector: 'app-login',
-  styleUrl: './login.scss',
+  imports: [FormsModule],
   templateUrl: './login.html',
+  styleUrl: './login.scss',
 })
 export class Login {
-  private readonly auth = inject(AuthService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
 
   correo = '';
   contrasena = '';
-  error = '';
-  cargando = false;
   mostrarContrasena = false;
+  cargando = false;
+  error = '';
 
-  ingresar(): void {
-    if (this.cargando) return;
+  iniciarSesion(): void {
     this.error = '';
+    if (!this.correo.trim() || !this.contrasena) {
+      this.error = 'Escribe tu correo electrónico y contraseña.';
+      return;
+    }
+
     this.cargando = true;
-    this.auth.login(this.correo.trim(), this.contrasena).subscribe({
-      next: () => {
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
-        const destinoLocal = returnUrl.startsWith('/') && !returnUrl.startsWith('//');
-        void this.router.navigateByUrl(destinoLocal ? returnUrl : '/dashboard');
-      },
-      error: () => {
-        this.error = 'Correo o contraseña incorrectos, o cuenta inactiva.';
-        this.cargando = false;
-      },
-    });
+    this.authService.iniciarSesion(this.correo.trim(), this.contrasena)
+      .pipe(finalize(() => (this.cargando = false)))
+      .subscribe({
+        next: (respuesta) => {
+          sessionStorage.setItem('emsStoreUser', JSON.stringify(respuesta.usuario));
+          sessionStorage.setItem('emsStoreToken', respuesta.token);
+          void this.router.navigateByUrl('/dashboard');
+        },
+        error: (error) => {
+          if (error.status === 401) {
+            this.error = 'Correo o contraseña incorrectos, o usuario inactivo.';
+          } else if (error.status === 0) {
+            this.error = 'No se pudo conectar con el servidor. Verifica que el backend esté iniciado.';
+          } else {
+            this.error = 'No se pudo iniciar sesión. Inténtalo nuevamente.';
+          }
+        },
+      });
   }
 }

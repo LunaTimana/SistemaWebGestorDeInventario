@@ -25,23 +25,16 @@
 <section class="tarjeta barra-herramientas">
   <div class="buscador">
     <i class="bi bi-search"></i>
-    <input type="text" placeholder="Buscar por SKU o producto..." />
+    <input type="text" placeholder="Buscar por SKU o producto..." [(ngModel)]="busqueda" />
   </div>
 
-  <select class="filtro" aria-label="Tipo de operación">
-    <option>Tipo: Todos</option>
-    <option>Ingreso</option>
-    <option>Salida</option>
-    <option>Ajuste</option>
-  </select>
+  <select class="filtro" aria-label="Tipo de operación" [(ngModel)]="tipoFiltro"><option value="">Tipo: Todos</option><option value="ingreso">Ingreso</option><option value="salida">Salida</option><option value="ajuste">Ajuste</option></select>
 
-  <button type="button" class="filtro">
-    Rango: Hoy (26/10/2026) <i class="bi bi-calendar3"></i>
-  </button>
-
-  <button type="button" class="boton-negro"><i class="bi bi-download"></i> Exportar Excel</button>
+  <button type="button" class="boton-claro" (click)="cargar()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button>
 </section>
 
+@if (cargando) { <p class="text-center p-3">Cargando historial...</p> }
+@if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
 <section class="tarjeta tabla-tarjeta">
   <div class="tabla-scroll">
     <table class="tabla">
@@ -58,7 +51,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (m of movimientos; track m.id) {
+        @for (m of movimientosFiltrados; track m.id) {
           <tr>
             <td class="fuerte">{{ m.id }}</td>
             <td class="suave">{{ m.fecha }}</td>
@@ -75,7 +68,7 @@
   </div>
 
   <footer class="tabla-pie">
-    <span class="suave">Mostrando 1-5 de 2,412 movimientos registrados</span>
+    <span class="suave">Mostrando {{ movimientosFiltrados.length }} movimientos registrados</span>
     <div class="paginacion">
       <button type="button" class="boton-claro">Anterior</button>
       <button type="button" class="boton-negro">Siguiente</button>

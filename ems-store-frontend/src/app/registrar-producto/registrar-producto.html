@@ -1,115 +1,151 @@
 <div class="row g-3">
-  <!-- Formulario -->
   <div class="col-12 col-lg-8">
-    <form class="tarjeta">
-      <h2 class="titulo-formulario">Especificaciones del Artículo Deportivo</h2>
-
-      <div class="row g-3">
-        <div class="col-12 col-md-8">
-          <label for="nombre">Nombre del Producto *</label>
-          <input id="nombre" type="text" value="Calzas Cortas de Compresión Under Armour" />
+    <form class="tarjeta formulario-producto" #formProducto="ngForm" (ngSubmit)="guardarProducto()">
+      <div class="encabezado-formulario">
+        <div>
+          <h2 class="titulo-formulario">{{ editando ? 'Editar producto' : 'Registrar producto' }}</h2>
+          <p>Los datos se guardan directamente en la base de datos de EMS Store.</p>
         </div>
-        <div class="col-12 col-md-4">
-          <label for="sku">SKU (Generado) *</label>
-          <input id="sku" type="text" value="UA-COMP-SHORT-L" readonly />
-        </div>
-
-        <div class="col-6 col-md-3">
-          <label for="categoria">Categoría *</label>
-          <select id="categoria">
-            <option selected>Ropa Deportiva</option>
-            <option>Calzado Deportivo</option>
-            <option>Accesorios</option>
-          </select>
-        </div>
-        <div class="col-6 col-md-3">
-          <label for="marca">Marca *</label>
-          <select id="marca">
-            <option selected>Under Armour</option>
-            <option>Nike</option>
-            <option>Adidas</option>
-            <option>Puma</option>
-          </select>
-        </div>
-        <div class="col-6 col-md-3">
-          <label for="talla">Talla *</label>
-          <select id="talla">
-            <option>S</option>
-            <option>M</option>
-            <option selected>L</option>
-            <option>XL</option>
-            <option>42</option>
-            <option>43</option>
-          </select>
-        </div>
-        <div class="col-6 col-md-3">
-          <label for="color">Color *</label>
-          <select id="color">
-            <option selected>Negro / Verde</option>
-            <option>Negro</option>
-            <option>Azul Marino</option>
-            <option>Gris</option>
-            <option>Blanco</option>
-            <option>Neon Verde</option>
-          </select>
-        </div>
-
-        <div class="col-6 col-md-3">
-          <label for="costo">Costo Unitario (S/) *</label>
-          <input id="costo" type="number" step="0.01" min="0" value="24.50" />
-        </div>
-        <div class="col-6 col-md-3">
-          <label for="precio">Precio Comercial Venta (S/) *</label>
-          <input id="precio" type="number" step="0.01" min="0" value="59.99" />
-        </div>
-        <div class="col-6 col-md-3">
-          <label for="cantidad">Cantidad Inicial *</label>
-          <input id="cantidad" type="number" min="0" value="50" />
-        </div>
-        <div class="col-6 col-md-3">
-          <label for="proveedor">Proveedor Asociado</label>
-          <select id="proveedor">
-            <option selected>UA Distribuidora</option>
-            <option>Distribuidora Nike</option>
-            <option>Distribuidora Adidas</option>
-            <option>Distribuidora Puma</option>
-          </select>
-        </div>
+        <span class="etiqueta-modo">{{ editando ? 'Edición' : 'Nuevo registro' }}</span>
       </div>
 
+      @if (cargando) {
+        <div class="alert alert-info">Cargando catálogos...</div>
+      }
+      @if (error) {
+        <div class="alert alert-danger" role="alert">{{ error }}</div>
+      }
+
+      <fieldset [disabled]="cargando || guardando">
+        <h3 class="subtitulo-formulario">Información del producto</h3>
+        <div class="row g-3">
+          <div class="col-12 col-md-8">
+            <label for="nombreModelo">Nombre del producto *</label>
+            <input id="nombreModelo" name="nombreModelo" type="text" maxlength="100"
+              [(ngModel)]="productoForm.nombreModelo" (ngModelChange)="generarSku()" required />
+          </div>
+          <div class="col-12 col-md-4">
+            <label for="sku">SKU de la variante *</label>
+            <input id="sku" name="sku" type="text" [(ngModel)]="varianteForm.codigoUnico" readonly required />
+          </div>
+
+          <div class="col-12 col-md-4">
+            <label for="categoria">Categoría *</label>
+            <select id="categoria" name="categoriaId" [(ngModel)]="productoForm.categoriaId" required>
+              <option [ngValue]="0" disabled>Selecciona una categoría</option>
+              @for (categoria of categorias; track categoria.id) {
+                <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <label for="marca">Marca *</label>
+            <select id="marca" name="marcaId" [(ngModel)]="productoForm.marcaId" (ngModelChange)="generarSku()" required>
+              <option [ngValue]="0" disabled>Selecciona una marca</option>
+              @for (marca of marcas; track marca.id) {
+                <option [ngValue]="marca.id">{{ marca.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-12 col-md-4">
+            <label for="proveedor">Proveedor asociado</label>
+            <select id="proveedor" name="proveedorId" [(ngModel)]="productoForm.proveedorId">
+              <option [ngValue]="null">Sin proveedor</option>
+              @for (proveedor of proveedores; track proveedor.id) {
+                <option [ngValue]="proveedor.id">{{ proveedor.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <label for="diseno">Diseño / modelo (opcional)</label>
+            <input id="diseno" name="diseno" type="text" maxlength="100" [(ngModel)]="productoForm.diseno" />
+          </div>
+          <div class="col-12 col-md-6">
+            <label for="imagenUrl">URL de imagen (opcional)</label>
+            <input id="imagenUrl" name="imagenUrl" type="url" maxlength="255" [(ngModel)]="productoForm.imagenUrl" />
+          </div>
+          <div class="col-12">
+            <label for="descripcion">Descripción (opcional)</label>
+            <textarea id="descripcion" name="descripcion" rows="2" [(ngModel)]="productoForm.descripcion"></textarea>
+          </div>
+        </div>
+
+        <h3 class="subtitulo-formulario mt-4">Variante y existencias</h3>
+        <div class="row g-3">
+          <div class="col-6 col-md-3">
+            <label for="talla">Talla *</label>
+            <select id="talla" name="talla" [(ngModel)]="varianteForm.talla" (ngModelChange)="generarSku()" required>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="42">42</option>
+              <option value="43">43</option>
+              <option value="Única">Única</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label for="color">Color *</label>
+            <input id="color" name="color" type="text" maxlength="40" [(ngModel)]="varianteForm.color"
+              (ngModelChange)="generarSku()" required />
+          </div>
+          <div class="col-6 col-md-3">
+            <label for="stockActual">Cantidad inicial *</label>
+            <input id="stockActual" name="stockActual" type="number" min="0" step="1"
+              [(ngModel)]="varianteForm.stockActual" required />
+          </div>
+          <div class="col-6 col-md-3">
+            <label for="stockMinimo">Stock mínimo *</label>
+            <input id="stockMinimo" name="stockMinimo" type="number" min="0" step="1"
+              [(ngModel)]="varianteForm.stockMinimo" required />
+          </div>
+        </div>
+
+        <h3 class="subtitulo-formulario mt-4">Información financiera</h3>
+        <div class="row g-3">
+          <div class="col-6 col-md-6">
+            <label for="costo">Costo unitario (S/) *</label>
+            <input id="costo" name="costoUnitario" type="number" min="0" step="0.01"
+              [(ngModel)]="productoForm.costoUnitario" required />
+          </div>
+          <div class="col-6 col-md-6">
+            <label for="precio">Precio de venta (S/) *</label>
+            <input id="precio" name="precioVenta" type="number" min="0" step="0.01"
+              [(ngModel)]="productoForm.precioVenta" required />
+          </div>
+        </div>
+      </fieldset>
+
       <div class="acciones-formulario">
-        <button type="button" class="boton-lima">Guardar Producto</button>
+        <button type="submit" class="boton-lima" [disabled]="cargando || guardando">
+          @if (guardando) { Guardando... } @else { {{ editando ? 'Guardar cambios' : 'Guardar producto' }} }
+        </button>
         <a class="boton-claro" routerLink="/inventario">Cancelar</a>
       </div>
     </form>
   </div>
 
-  <!-- Columna derecha -->
   <div class="col-12 col-lg-4 d-flex flex-column gap-3">
-    <section class="tarjeta">
-      <h3 class="titulo-formulario">Imagen del Producto</h3>
-      <label class="subida" for="imagen">
-        <i class="bi bi-image"></i>
-        <strong>Subir archivo de imagen</strong>
-        <small>PNG, JPG de alta resolución</small>
-        <input id="imagen" type="file" accept="image/png, image/jpeg" hidden />
-      </label>
-    </section>
-
     <section class="previsualizacion">
-      <h3>Previsualización Financiera</h3>
+      <h3>Resumen financiero</h3>
       <div class="previsualizacion__fila">
-        <span>Margen Comercial Estimado</span>
-        <strong class="verde">59.1%</strong>
+        <span>Margen estimado</span>
+        <strong class="verde">{{ margenPorcentaje | number:'1.1-1' }}%</strong>
       </div>
       <div class="previsualizacion__fila">
-        <span>Ganancia Neta por Unidad</span>
-        <strong>+S/ 35.49</strong>
+        <span>Ganancia por unidad</span>
+        <strong>S/ {{ gananciaUnidad | number:'1.2-2' }}</strong>
       </div>
       <div class="previsualizacion__fila">
-        <span>Valor Inicial Inventario</span>
-        <strong>S/ 1,225.00</strong>
+        <span>Valor del stock inicial (costo)</span>
+        <strong>S/ {{ valorInventario | number:'1.2-2' }}</strong>
       </div>
+    </section>
+    <section class="tarjeta nota-producto">
+      <h3 class="titulo-formulario">Importante</h3>
+      <p>Este formulario registra un modelo y una variante (talla y color). Para agregar otras tallas o colores del mismo modelo, registra otra variante desde el formulario.</p>
+      <p>El SKU se genera automáticamente y se guarda junto con el stock en la base de datos.</p>
     </section>
   </div>
 </div>

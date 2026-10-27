@@ -1,30 +1,51 @@
 <section class="tarjeta barra-herramientas">
   <div class="buscador">
     <i class="bi bi-search"></i>
-    <input type="text" placeholder="Buscar por nombre o SKU..." />
+    <input type="search" placeholder="Buscar por nombre, marca o SKU..." [(ngModel)]="busqueda" />
   </div>
 
-  <select class="filtro" aria-label="Categoría">
-    <option>Categoría: Todas</option>
-    <option>Calzado</option>
-    <option>Ropa</option>
-    <option>Accesorios</option>
+  <select class="filtro" aria-label="Categoría" [(ngModel)]="categoriaSeleccionada">
+    <option value="">Categoría: Todas</option>
+    @for (categoria of categorias; track categoria.id) {
+      <option [value]="categoria.nombre">{{ categoria.nombre }}</option>
+    }
   </select>
 
-  <select class="filtro" aria-label="Talla">
-    <option>Talla: Todas</option>
-    <option>S</option>
-    <option>M</option>
-    <option>L</option>
-    <option>XL</option>
-    <option>42</option>
-    <option>43</option>
+  <select class="filtro" aria-label="Talla" [(ngModel)]="tallaSeleccionada">
+    <option value="">Talla: Todas</option>
+    <option value="S">S</option>
+    <option value="M">M</option>
+    <option value="L">L</option>
+    <option value="XL">XL</option>
+    <option value="42">42</option>
+    <option value="43">43</option>
   </select>
+
+  <input #archivoExcel type="file" accept=".xlsx" hidden (change)="importarExcel($event)" />
+  <button type="button" class="boton-claro" (click)="archivoExcel.click()" [disabled]="importandoExcel">
+    <i class="bi bi-file-earmark-arrow-up"></i>
+    {{ importandoExcel ? 'Importando Excel...' : 'Importar Excel' }}
+  </button>
+
+  <button type="button" class="boton-claro" (click)="exportarExcel()" [disabled]="exportandoExcel">
+    <i class="bi bi-file-earmark-excel"></i>
+    {{ exportandoExcel ? 'Generando Excel...' : 'Exportar Excel' }}
+  </button>
 
   <a class="boton-negro" routerLink="/registrar-producto">
     <i class="bi bi-plus-lg"></i> Registrar Producto
   </a>
 </section>
+
+@if (cargando) {
+  <p class="text-center p-3">Cargando inventario...</p>
+}
+@if (error) {
+  <div class="alert alert-danger mt-3" role="alert">{{ error }}</div>
+}
+@if (mensaje) {
+  <div class="alert alert-success mt-3" role="status">{{ mensaje }}</div>
+}
 
 <section class="tarjeta tabla-tarjeta">
   <div class="tabla-scroll">
@@ -44,7 +65,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (p of productos; track p.sku) {
+        @for (p of productosFiltrados; track p.sku) {
           <tr>
             <td class="sku">{{ p.sku }}</td>
             <td class="suave">{{ p.marca }}</td>
@@ -54,22 +75,42 @@
             <td class="suave">{{ p.color }}</td>
             <td class="fuerte" [class.critico]="p.stock === 0">{{ p.stock }} uds</td>
             <td class="precio">S/ {{ p.precio.toFixed(2) }}</td>
-            <td><span [class]="'estado ' + p.claseEstado">{{ p.estado }}</span></td>
+            <td>
+              <span class="estado"
+                [class.disponible]="p.estado === 'Disponible'"
+                [class.bajo]="p.estado === 'Bajo Stock'"
+                [class.sin]="p.estado === 'Sin Stock'">
+                {{ p.estado }}
+              </span>
+            </td>
             <td class="acciones">
-              <a [routerLink]="['/inventario/editar', p.sku]" aria-label="Editar producto"><i class="bi bi-pencil"></i></a>
-              <a [routerLink]="['/inventario/detalle', p.sku]" aria-label="Ver detalle"><i class="bi bi-eye"></i></a>
+              <a [routerLink]="['/inventario/editar', p.sku]" aria-label="Editar producto" title="Editar producto">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <a [routerLink]="['/inventario/detalle', p.sku]" aria-label="Ver detalle" title="Ver detalle">
+                <i class="bi bi-eye"></i>
+              </a>
+              <button type="button" class="accion-eliminar" (click)="eliminarProducto(p)"
+                [disabled]="eliminandoId === p.id" aria-label="Eliminar producto" title="Eliminar producto">
+                <i class="bi bi-trash"></i>
+              </button>
             </td>
           </tr>
+        } @empty {
+          @if (!cargando) {
+            <tr>
+              <td colspan="10" class="text-center p-4">
+                No se encontraron productos con esos filtros.
+              </td>
+            </tr>
+          }
         }
       </tbody>
     </table>
   </div>
 
   <footer class="tabla-pie">
-    <span class="suave">Mostrando 1-5 de 184 productos registrados</span>
-    <div class="paginacion">
-      <button type="button" class="boton-claro">Anterior</button>
-      <button type="button" class="boton-negro">Siguiente</button>
-    </div>
+    <span class="suave">Mostrando {{ productosFiltrados.length }} variantes</span>
+    <a class="boton-claro" routerLink="/registrar-producto">Agregar producto</a>
   </footer>
 </section>

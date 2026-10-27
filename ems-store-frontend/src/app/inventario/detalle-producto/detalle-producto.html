@@ -1,54 +1,45 @@
-<div class="row g-3">
-  <!-- Ficha del producto -->
-  <div class="col-12 col-lg-8">
-    <section class="tarjeta ficha">
-      <div class="ficha__imagen"><i class="bi bi-bag"></i></div>
+@if (cargando) {
+  <p class="text-center p-3">Cargando detalle del producto...</p>
+}
+@if (error) {
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+}
 
-      <div class="ficha__datos">
-        <span class="ficha__marca">{{ producto.marca }}</span>
-        <h2 class="ficha__nombre">{{ producto.nombre }}</h2>
-        <p class="ficha__sku">SKU: {{ producto.sku }} | Categoría: {{ producto.categoria }}</p>
+@if (!cargando && !error) {
+  <div class="row g-3">
+    <div class="col-12 col-lg-8">
+      <section class="tarjeta ficha">
+        <div class="ficha__imagen"><i class="bi bi-bag"></i></div>
+        <div class="ficha__datos">
+          <span class="ficha__marca">{{ producto.marca }}</span>
+          <h2 class="ficha__nombre">{{ producto.nombre }}</h2>
+          <p class="ficha__sku">SKU: {{ producto.sku }} | Categoría: {{ producto.categoria }}</p>
 
-        <div class="ficha__atributos">
-          <div>
-            <small>Talla</small>
-            <strong>{{ producto.talla }}</strong>
+          <div class="ficha__atributos">
+            <div><small>Talla</small><strong>{{ producto.talla }}</strong></div>
+            <div><small>Color</small><strong>{{ producto.color }}</strong></div>
+            <div><small>Precio comercial</small><strong class="verde">{{ producto.precio }}</strong></div>
           </div>
-          <div>
-            <small>Color</small>
-            <strong>{{ producto.color }}</strong>
+
+          <small class="ficha__etiqueta">Stock disponible</small>
+          <div class="ficha__stock">
+            <strong>{{ producto.stock }}</strong>
+            <span class="estado">{{ producto.estado }}</span>
           </div>
-          <div>
-            <small>Precio Comercial</small>
-            <strong class="verde">{{ producto.precio }}</strong>
-          </div>
+
+          <a class="boton-negro" [routerLink]="['/inventario/editar', producto.sku]">Editar producto</a>
+          <a class="boton-claro ms-2" routerLink="/inventario">Volver al inventario</a>
         </div>
+      </section>
+    </div>
 
-        <small class="ficha__etiqueta">Stock Disponible</small>
-        <div class="ficha__stock">
-          <strong>{{ producto.stock }}</strong>
-          <span class="estado">{{ producto.estado }}</span>
-        </div>
-
-        <a class="boton-negro" [routerLink]="['/inventario/editar', producto.sku]">Editar Producto</a>
-      </div>
-    </section>
+    <div class="col-12 col-lg-4">
+      <section class="tarjeta">
+        <h3 class="titulo-seccion">Historial de movimientos</h3>
+        <p class="text-muted mb-0">
+          El detalle del producto ya se consulta desde la base de datos. El historial aparecerá aquí cuando se habilite el registro de movimientos en el backend.
+        </p>
+      </section>
+    </div>
   </div>
-
-  <!-- Historial -->
-  <div class="col-12 col-lg-4">
-    <section class="tarjeta">
-      <h3 class="titulo-seccion">Historial de Movimientos</h3>
-      @for (h of historial; track h.titulo + h.fecha) {
-        <div class="movimiento">
-          <span [class]="'punto ' + h.clase"></span>
-          <div class="movimiento__texto">
-            <strong>{{ h.titulo }}</strong>
-            <small>{{ h.fecha }}</small>
-          </div>
-          <strong [class]="'movimiento__cantidad ' + h.clase">{{ h.cantidad }}</strong>
-        </div>
-      }
-    </section>
-  </div>
-</div>
+}

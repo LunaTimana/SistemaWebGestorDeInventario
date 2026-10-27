@@ -145,3 +145,84 @@ select {
     }
   }
 }
+
+.formulario-producto {
+  padding: 22px;
+}
+
+.encabezado-formulario {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  p {
+    color: var(--ems-texto-suave);
+    font-size: 0.76rem;
+    margin: 0;
+  }
+}
+
+.etiqueta-modo {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eefbd7;
+  color: #365314;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.subtitulo-formulario {
+  margin: 4px 0 16px;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+input[type='url'],
+textarea {
+  width: 100%;
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ems-texto);
+  font-size: 0.78rem;
+  padding: 9px 10px;
+  outline: none;
+
+  &:focus {
+    border-color: #0f1115;
+  }
+}
+
+textarea {
+  resize: vertical;
+}
+
+fieldset {
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+fieldset:disabled {
+  opacity: 0.7;
+}
+
+.acciones-formulario button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.nota-producto {
+  padding: 20px;
+
+  p {
+    color: var(--ems-texto-suave);
+    font-size: 0.76rem;
+    line-height: 1.55;
+    margin-bottom: 10px;
+  }
+}

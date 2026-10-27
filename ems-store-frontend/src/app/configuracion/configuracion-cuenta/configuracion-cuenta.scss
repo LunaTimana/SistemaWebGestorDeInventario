@@ -213,3 +213,44 @@ input[type='password'] {
     color: var(--ems-texto-suave);
   }
 }
+
+.sesion-cuenta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  strong {
+    font-size: 0.82rem;
+  }
+
+  p {
+    margin: 4px 0 0;
+    font-size: 0.72rem;
+    color: var(--ems-texto-suave);
+  }
+}
+
+.boton-cerrar-sesion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid #dc2626;
+  border-radius: 10px;
+  padding: 10px 16px;
+  background: #fff;
+  color: #b91c1c;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: #fef2f2;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #b91c1c;
+    outline-offset: 2px;
+  }
+}

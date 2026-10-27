@@ -1,13 +1,9 @@
 package com.emsstore.backend.repository;
-
-import java.util.Optional;
-
+import com.emsstore.backend.entity.Producto;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.emsstore.backend.model.Producto;
-
-public interface ProductoRepository extends JpaRepository<Producto, Integer> {
-    Optional<Producto> findFirstByMarcaIdAndNombreModeloIgnoreCase(Integer marcaId, String nombreModelo);
-    Optional<Producto> findFirstByMarcaIdAndCategoriaIdAndNombreModeloIgnoreCase(
-            Integer marcaId, Integer categoriaId, String nombreModelo);
+import org.springframework.data.jpa.repository.Query;
+import java.util.List;
+public interface ProductoRepository extends JpaRepository<Producto,Integer> {
+ @Query("select p from Producto p where lower(p.nombreModelo) like lower(concat('%', :q, '%'))")
+ List<Producto> buscarPorNombre(String q);
 }

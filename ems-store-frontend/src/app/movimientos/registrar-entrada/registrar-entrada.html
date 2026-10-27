@@ -1,70 +1,24 @@
 <div class="row g-3">
-  <!-- Formulario -->
   <div class="col-12 col-lg-8">
-    <form class="tarjeta">
+    <form class="tarjeta" (ngSubmit)="registrar()">
       <h2 class="titulo-formulario">Nueva Operación de Entrada</h2>
-
+      @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
+      @if (mensaje) { <div class="alert alert-success" role="status">{{ mensaje }}</div> }
       <div class="row g-3">
-        <div class="col-12">
-          <label for="producto">Seleccionar Producto *</label>
-          <select id="producto">
-            @for (p of productos; track p) {
-              <option>{{ p }}</option>
-            }
+        <div class="col-12"><label for="producto">Seleccionar variante / SKU *</label>
+          <select id="producto" name="varianteId" [(ngModel)]="varianteId" required>
+            <option [ngValue]="null">Selecciona un SKU</option>
+            @for (v of variantes; track v.id) { <option [ngValue]="v.id">{{ v.etiqueta }}</option> }
           </select>
         </div>
-
-        <div class="col-12 col-md-6">
-          <label for="cantidad">Cantidad a Ingresar *</label>
-          <input id="cantidad" type="number" min="1" value="45" />
-        </div>
-        <div class="col-12 col-md-6">
-          <label for="proveedor">Proveedor *</label>
-          <select id="proveedor">
-            @for (p of proveedores; track p) {
-              <option>{{ p }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="col-12 col-md-6">
-          <label for="fecha">Fecha de Operación</label>
-          <input id="fecha" type="text" [value]="fecha" readonly />
-        </div>
-        <div class="col-12 col-md-6">
-          <label for="responsable">Responsable *</label>
-          <select id="responsable">
-            @for (r of responsables; track r) {
-              <option>{{ r }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="col-12">
-          <label for="notas">Comentario / Notas Adicionales</label>
-          <textarea id="notas" rows="3">Ingreso de lote para campaña de fin de año. Todo en óptimas condiciones.</textarea>
-        </div>
+        <div class="col-12 col-md-6"><label for="cantidad">Cantidad a ingresar *</label><input id="cantidad" name="cantidad" type="number" min="1" step="1" [(ngModel)]="cantidad" required /></div>
+        <div class="col-12 col-md-6"><label for="motivo">Motivo *</label><select id="motivo" name="motivo" [(ngModel)]="motivo"><option value="compra">Compra</option><option value="ajuste">Ajuste de inventario</option></select></div>
+        @if (motivo === 'compra') { <div class="col-12"><label for="proveedor">Proveedor *</label><select id="proveedor" name="proveedorId" [(ngModel)]="proveedorId" required><option [ngValue]="null">Selecciona proveedor</option>@for (p of proveedores; track p.id) { <option [ngValue]="p.id">{{ p.nombre }}</option> }</select></div> }
+        <div class="col-12"><label for="documento">Documento / referencia</label><input id="documento" name="documento" [(ngModel)]="documento" maxlength="50" placeholder="Guía de remisión, factura..." /></div>
+        <div class="col-12"><label for="notas">Comentario</label><textarea id="notas" name="comentario" rows="3" [(ngModel)]="comentario" maxlength="255"></textarea></div>
       </div>
-
-      <div class="acciones-formulario">
-        <button type="button" class="boton-lima">Registrar Entrada</button>
-        <a class="boton-claro" routerLink="/movimientos">Cancelar</a>
-      </div>
+      <div class="acciones-formulario"><button type="submit" class="boton-lima" [disabled]="guardando || cargando">{{ guardando ? 'Guardando...' : 'Registrar Entrada' }}</button><a class="boton-claro" routerLink="/movimientos">Cancelar</a></div>
     </form>
   </div>
-
-  <!-- Resumen de proyección -->
-  <div class="col-12 col-lg-4">
-    <section class="tarjeta">
-      <h3 class="titulo-formulario">Resumen de Proyección</h3>
-      <div class="proyeccion">
-        <small>Stock Actual del Producto</small>
-        <strong>{{ resumen.actual }}</strong>
-      </div>
-      <div class="proyeccion proyeccion--verde">
-        <small>Stock Proyectado (Post-ingreso)</small>
-        <strong>{{ resumen.proyectado }}</strong>
-      </div>
-    </section>
-  </div>
+  <div class="col-12 col-lg-4"><section class="tarjeta"><h3 class="titulo-formulario">Resumen de proyección</h3><div class="proyeccion"><small>Stock actual</small><strong>{{ varianteSeleccionada?.stockActual ?? '—' }} unidades</strong></div><div class="proyeccion proyeccion--verde"><small>Stock proyectado</small><strong>{{ varianteSeleccionada ? stockProyectado : '—' }} unidades</strong></div></section></div>
 </div>

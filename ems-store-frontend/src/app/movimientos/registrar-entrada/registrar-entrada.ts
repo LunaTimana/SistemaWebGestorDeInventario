@@ -1,28 +1,44 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
+import { ProductoService, Producto, VarianteProducto, Proveedor } from '../../services/producto';
 
-// Datos de ejemplo tomados del prototipo de Figma.
-// Cuando exista la API, se reemplazan por servicios con HttpClient.
-@Component({
-  selector: 'app-registrar-entrada',
-  imports: [RouterLink],
-  templateUrl: './registrar-entrada.html',
-  styleUrl: './registrar-entrada.scss',
-})
-export class RegistrarEntrada {
-  productos = [
-    'Zapatillas Pegasus 40 Zoom • NK-PEG40-10',
-    'Polera de Entrenamiento TechFit • AD-TFIT-M',
-    'Cortavientos Storm Impermeable • UA-STORM-L',
-    'Shorts de Running Dri-FIT Flex • NK-DRIT-S',
-    'Zapatillas Deviate Nitro Elite • PM-DEVI-43',
-  ];
-
-  proveedores = ['Nike Distribuciones S.A.', 'UA Distribuidora', 'Distribuidora Adidas', 'Distribuidora Puma'];
-
-  responsables = ['Carlos Mendoza', 'Marcio Morales'];
-
-  fecha = '26/10/2026';
-
-  resumen = { actual: '15 unidades', proyectado: '60 unidades' };
+interface OpcionVariante extends VarianteProducto { etiqueta: string; nombreProducto: string; }
+@Component({ selector: 'app-registrar-entrada', imports: [RouterLink, FormsModule], templateUrl: './registrar-entrada.html', styleUrl: './registrar-entrada.scss' })
+export class RegistrarEntrada implements OnInit {
+  private readonly service = inject(ProductoService);
+  private readonly router = inject(Router);
+  variantes: OpcionVariante[] = [];
+  proveedores: Proveedor[] = [];
+  varianteId: number | null = null;
+  proveedorId: number | null = null;
+  cantidad = 1;
+  motivo = 'compra';
+  documento = '';
+  comentario = '';
+  cargando = true;
+  guardando = false;
+  error = '';
+  mensaje = '';
+  ngOnInit(): void {
+    forkJoin({ productos: this.service.obtenerProductos(), variantes: this.service.obtenerVariantes(), proveedores: this.service.obtenerProveedores() }).subscribe({
+      next: ({ productos, variantes, proveedores }) => {
+        this.variantes = variantes.map(v => ({ ...v, nombreProducto: productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`, etiqueta: `${v.codigoUnico} · ${productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`} · ${v.talla}/${v.color} (stock: ${v.stockActual})` }));
+        this.proveedores = proveedores; this.cargando = false;
+      }, error: () => { this.error = 'No se pudieron cargar productos y proveedores.'; this.cargando = false; }
+    });
+  }
+  get varianteSeleccionada(): OpcionVariante | undefined { return this.variantes.find(v => v.id === Number(this.varianteId)); }
+  get stockProyectado(): number { return (this.varianteSeleccionada?.stockActual ?? 0) + Math.max(0, Number(this.cantidad) || 0); }
+  registrar(): void {
+    this.error = ''; this.mensaje = '';
+    if (!this.varianteId || !this.cantidad || this.cantidad < 1 || !Number.isInteger(Number(this.cantidad))) { this.error = 'Selecciona una variante e ingresa una cantidad entera mayor que cero.'; return; }
+    if (this.motivo === 'compra' && !this.proveedorId) { this.error = 'Selecciona el proveedor de la compra.'; return; }
+    this.guardando = true;
+    this.service.registrarMovimiento({ varianteId: Number(this.varianteId), tipo: 'entrada', motivo: this.motivo, cantidad: Number(this.cantidad), proveedorId: this.motivo === 'compra' ? Number(this.proveedorId) : null, documento: this.documento, comentario: this.comentario }).subscribe({
+      next: r => { this.guardando = false; this.mensaje = `${r.mensaje} Stock actualizado: ${r.stockAnterior} → ${r.stockNuevo}.`; void this.router.navigate(['/movimientos']); },
+      error: e => { this.guardando = false; this.error = e?.error?.detail || 'No se pudo registrar la entrada.'; }
+    });
+  }
 }

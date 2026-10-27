@@ -1,26 +1,47 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { ProductoService, MovimientoInventario } from '../services/producto';
 
-// Datos de ejemplo tomados del prototipo de Figma.
-// Cuando exista la API, se reemplazan por un servicio con HttpClient.
-@Component({
-  selector: 'app-movimientos',
-  imports: [RouterLink],
-  templateUrl: './movimientos.html',
-  styleUrl: './movimientos.scss',
-})
-export class Movimientos {
+interface FilaMovimiento { id: number; fecha: string; tipo: string; clase: string; sku: string; producto: string; cantidad: string; responsable: string; origen: string; }
+@Component({ selector: 'app-movimientos', imports: [RouterLink, FormsModule], templateUrl: './movimientos.html', styleUrl: './movimientos.scss' })
+export class Movimientos implements OnInit {
+  private readonly service = inject(ProductoService);
+  cargando = true;
+  error = '';
+  busqueda = '';
+  tipoFiltro = '';
   resumen = [
-    { titulo: 'Total entradas', subtitulo: 'Ingresos registrados', insignia: '+45 uds', valor: '+45 uds', detalle: '2 movimientos de ingreso registrados en el período seleccionado.', icono: 'bi-plus-circle', tono: 'verde' },
-    { titulo: 'Total salidas', subtitulo: 'Salidas registradas', insignia: '-3 uds', valor: '-3 uds', detalle: '2 movimientos de salida registrados en el período seleccionado.', icono: 'bi-dash-circle', tono: 'rojo' },
-    { titulo: 'Ajustes y pérdidas', subtitulo: 'Movimientos no comerciales', insignia: '-1 ud', valor: '-1 ud', detalle: '1 ajuste o pérdida registrada en el período seleccionado.', icono: 'bi-search', tono: 'naranja' },
+    { titulo: 'Total entradas', subtitulo: 'Ingresos registrados', insignia: '0 uds', valor: '0 uds', detalle: 'Sin movimientos de entrada.', icono: 'bi-plus-circle', tono: 'verde' },
+    { titulo: 'Total salidas', subtitulo: 'Salidas registradas', insignia: '0 uds', valor: '0 uds', detalle: 'Sin movimientos de salida.', icono: 'bi-dash-circle', tono: 'rojo' },
+    { titulo: 'Ajustes y pérdidas', subtitulo: 'Movimientos no comerciales', insignia: '0 uds', valor: '0 uds', detalle: 'Sin ajustes o pérdidas.', icono: 'bi-search', tono: 'naranja' },
   ];
-
-  movimientos = [
-    { id: 'MV-9284', fecha: '26/10/2026 14:32', tipo: 'Salida', clase: 'rojo', sku: 'NK-DRIT-S', producto: 'Shorts de Running Dri-FIT Flex', cantidad: '-2 uds', responsable: 'Marcio Morales', origen: 'Boleta #4325' },
-    { id: 'MV-9283', fecha: '26/10/2026 11:15', tipo: 'Ingreso', clase: 'verde', sku: 'NK-PEG40-10', producto: 'Zapatillas Pegasus 40 Zoom', cantidad: '+45 uds', responsable: 'Carlos Mendoza', origen: 'Guía #9021' },
-    { id: 'MV-9282', fecha: '25/10/2026 17:45', tipo: 'Ajuste', clase: 'naranja', sku: 'UA-STORM-L', producto: 'Cortavientos Storm Impermeable', cantidad: '-1 ud', responsable: 'Marcio Morales', origen: 'Físico Audit' },
-    { id: 'MV-9281', fecha: '25/10/2026 09:20', tipo: 'Salida', clase: 'rojo', sku: 'AD-TFIT-M', producto: 'Polera de Entrenamiento TechFit', cantidad: '-1 ud', responsable: 'Carlos Mendoza', origen: 'Boleta #4321' },
-    { id: 'MV-9280', fecha: '24/10/2026 15:30', tipo: 'Ingreso', clase: 'verde', sku: 'AD-TFIT-M', producto: 'Polera de Entrenamiento TechFit', cantidad: '+10 uds', responsable: 'Carlos Mendoza', origen: 'Guía #8911' },
-  ];
+  movimientos: FilaMovimiento[] = [];
+  get movimientosFiltrados(): FilaMovimiento[] {
+    const q = this.busqueda.trim().toLocaleLowerCase();
+    return this.movimientos.filter(m => (!this.tipoFiltro || m.tipo.toLowerCase() === this.tipoFiltro) && (!q || `${m.sku} ${m.producto} ${m.responsable} ${m.origen}`.toLocaleLowerCase().includes(q)));
+  }
+  ngOnInit(): void { this.cargar(); }
+  cargar(): void {
+    this.cargando = true; this.error = '';
+    this.service.obtenerMovimientos().subscribe({
+      next: rows => {
+        this.movimientos = rows.map((m: MovimientoInventario) => ({
+          id: m.id, fecha: new Date(m.fecha).toLocaleString('es-PE'), tipo: m.tipo === 'entrada' ? 'Ingreso' : (m.motivo === 'ajuste' || m.motivo === 'merma' ? 'Ajuste' : 'Salida'),
+          clase: m.tipo === 'entrada' ? 'verde' : (m.motivo === 'ajuste' || m.motivo === 'merma' ? 'naranja' : 'rojo'), sku: m.sku,
+          producto: m.producto, cantidad: `${m.tipo === 'entrada' ? '+' : '-'}${m.cantidad} ${m.cantidad === 1 ? 'ud' : 'uds'}`,
+          responsable: m.responsable, origen: m.documento || m.destinoOrigen || m.motivo
+        }));
+        const entradas = rows.filter(m => m.tipo === 'entrada').reduce((sum, m) => sum + m.cantidad, 0);
+        const salidas = rows.filter(m => m.tipo === 'salida').reduce((sum, m) => sum + m.cantidad, 0);
+        const ajustes = rows.filter(m => ['ajuste', 'merma'].includes(m.motivo)).reduce((sum, m) => sum + m.cantidad, 0);
+        this.resumen = [
+          { titulo: 'Total entradas', subtitulo: 'Ingresos registrados', insignia: `+${entradas} uds`, valor: `+${entradas} uds`, detalle: `${rows.filter(m => m.tipo === 'entrada').length} movimientos de ingreso registrados.`, icono: 'bi-plus-circle', tono: 'verde' },
+          { titulo: 'Total salidas', subtitulo: 'Salidas registradas', insignia: `-${salidas} uds`, valor: `-${salidas} uds`, detalle: `${rows.filter(m => m.tipo === 'salida').length} movimientos de salida registrados.`, icono: 'bi-dash-circle', tono: 'rojo' },
+          { titulo: 'Ajustes y pérdidas', subtitulo: 'Movimientos no comerciales', insignia: `${ajustes} uds`, valor: `${ajustes} uds`, detalle: `${rows.filter(m => ['ajuste', 'merma'].includes(m.motivo)).length} ajustes o pérdidas registradas.`, icono: 'bi-search', tono: 'naranja' },
+        ];
+        this.cargando = false;
+      }, error: e => { this.error = e?.error?.detail || 'No se pudo cargar el historial de movimientos.'; this.cargando = false; }
+    });
+  }
 }
