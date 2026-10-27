@@ -84,16 +84,15 @@
               </span>
             </td>
             <td class="acciones">
-              <a [routerLink]="['/inventario/editar', p.sku]" aria-label="Editar producto" title="Editar producto">
-                <i class="bi bi-pencil"></i>
-              </a>
+              @if (puedeEditar) {
+                <a [routerLink]="['/inventario/editar', p.sku]" aria-label="Editar producto" title="Editar producto"><i class="bi bi-pencil"></i></a>
+              }
               <a [routerLink]="['/inventario/detalle', p.sku]" aria-label="Ver detalle" title="Ver detalle">
                 <i class="bi bi-eye"></i>
               </a>
-              <button type="button" class="accion-eliminar" (click)="eliminarProducto(p)"
-                [disabled]="eliminandoId === p.id" aria-label="Eliminar producto" title="Eliminar producto">
-                <i class="bi bi-trash"></i>
-              </button>
+              @if (puedeEliminar) {
+                <button type="button" class="accion-eliminar" (click)="eliminarProducto(p)" [disabled]="eliminandoId === p.id" aria-label="Eliminar producto" title="Eliminar producto"><i class="bi bi-trash"></i></button>
+              }
             </td>
           </tr>
         } @empty {
@@ -111,6 +110,5 @@
 
   <footer class="tabla-pie">
     <span class="suave">Mostrando {{ productosFiltrados.length }} variantes</span>
-    <a class="boton-claro" routerLink="/registrar-producto">Agregar producto</a>
   </footer>
 </section>

@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { MENU, SUBPANTALLAS } from '../../core/menu';
+import { Rol } from '../../core/rol';
 
 @Component({
   selector: 'app-layout',
@@ -13,7 +14,14 @@ import { MENU, SUBPANTALLAS } from '../../core/menu';
 export class Layout {
   private router = inject(Router);
 
-  menu = MENU;
+  menu = computed(() => {
+    let role = 'VENTAS';
+    try {
+      const user = JSON.parse(sessionStorage.getItem('emsStoreUser') ?? '{}') as { rol?: string };
+      role = user.rol === 'Administrador' ? 'ADMIN' : user.rol === 'Almacén' ? 'ALMACEN' : 'VENTAS';
+    } catch { role = 'VENTAS'; }
+    return MENU.filter(item => item.roles.includes(role as Rol));
+  });
   sucursal = 'Sucursal Principal';
   menuAbierto = signal(false);
 

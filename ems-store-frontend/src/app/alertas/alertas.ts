@@ -1,24 +1,36 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { ProductoService, ResumenAlertas } from '../services/producto';
 
-// Datos de ejemplo tomados del prototipo de Figma.
-// Cuando exista la API, se reemplazan por un servicio con HttpClient.
-@Component({
-  selector: 'app-alertas',
-  imports: [],
-  templateUrl: './alertas.html',
-  styleUrl: './alertas.scss',
-})
-export class Alertas {
+@Component({ selector: 'app-alertas', imports: [RouterLink], templateUrl: './alertas.html', styleUrl: './alertas.scss' })
+export class Alertas implements OnInit {
+  private readonly service = inject(ProductoService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  cargando = true;
+  error = '';
+  filtro: 'todos'|'criticos'|'riesgo' = 'todos';
   resumen = [
-    { titulo: 'Productos Críticos', valor: '4 ítems', tono: 'rojo' },
-    { titulo: 'Productos en Riesgo', valor: '10 ítems', tono: 'naranja' },
-    { titulo: 'Total Monitoreados', valor: '184 ítems', tono: 'neutro' },
+    { titulo:'Productos críticos', valor:'0', tono:'rojo' },
+    { titulo:'Productos en riesgo', valor:'0', tono:'naranja' },
+    { titulo:'Variantes monitoreadas', valor:'0', tono:'neutro' },
   ];
-
-  alertas = [
-    { sku: 'UA-STORM-L', producto: 'Cortavientos Storm Impermeable', stock: '0 uds', minimo: '10 uds', deficit: '-10 uds', estado: 'CRÍTICO', clase: 'rojo', ultimoIngreso: '15/10/2026' },
-    { sku: 'AD-TFIT-M', producto: 'Polera de Entrenamiento TechFit', stock: '8 uds', minimo: '15 uds', deficit: '-7 uds', estado: 'RIESGO', clase: 'naranja', ultimoIngreso: '18/10/2026' },
-    { sku: 'NK-PEG40-10', producto: 'Zapatillas Pegasus 40 Zoom', stock: '12 uds', minimo: '15 uds', deficit: '-3 uds', estado: 'RIESGO', clase: 'naranja', ultimoIngreso: '20/10/2026' },
-    { sku: 'PM-COOL-S', producto: 'Camiseta Puma Cool Running', stock: '1 ud', minimo: '8 uds', deficit: '-9 uds', estado: 'CRÍTICO', clase: 'rojo', ultimoIngreso: '05/10/2026' },
-  ];
+  alertas: { varianteId:number; sku:string; producto:string; talla:string; stock:number; minimo:number; deficit:number; estado:string; ultimoIngreso:string|null; clase:string }[] = [];
+  get alertasFiltradas() { return this.alertas.filter(a => this.filtro === 'todos' || (this.filtro === 'criticos' ? a.estado === 'CRÍTICO' : a.estado !== 'CRÍTICO')); }
+  ngOnInit(): void { this.cargar(); }
+  cargar(): void {
+    this.cargando = true; this.error = '';
+    this.service.obtenerAlertas().subscribe({
+      next: (d: ResumenAlertas) => {
+        this.resumen = [
+          { titulo:'Productos críticos', valor:String(d.criticos), tono:'rojo' },
+          { titulo:'Productos en riesgo', valor:String(d.riesgo), tono:'naranja' },
+          { titulo:'Variantes monitoreadas', valor:String(d.total), tono:'neutro' },
+        ];
+        this.alertas = d.alertas.map(a => ({ ...a, clase:a.estado === 'CRÍTICO' ? 'rojo' : 'naranja' }));
+        this.cargando = false;
+        this.cdr.markForCheck();
+      }, error: e => { this.error = e?.error?.detail || 'No se pudieron cargar las alertas desde la base de datos.'; this.cargando = false; this.cdr.markForCheck(); }
+    });
+  }
+  fecha(fecha:string|null): string { return fecha ? new Date(fecha).toLocaleDateString('es-PE') : 'Sin ingresos registrados'; }
 }

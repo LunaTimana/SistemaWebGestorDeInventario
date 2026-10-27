@@ -113,6 +113,8 @@
   &__relleno {
     height: 100%;
     border-radius: 999px;
+    background-color: #16a34a;
+    transition: width 250ms ease, background-color 250ms ease;
   }
 }
 

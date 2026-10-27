@@ -1,35 +1,44 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ProductoService, DashboardResumen } from '../../services/producto';
 
-// Datos de ejemplo tomados del prototipo de Figma.
-// Cuando exista la API, se reemplazan por un servicio con HttpClient.
-@Component({
-  selector: 'app-dashboard',
-  imports: [RouterLink],
-  templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss',
-})
-export class Dashboard {
+@Component({ selector: 'app-dashboard', imports: [RouterLink], templateUrl: './dashboard.html', styleUrl: './dashboard.scss' })
+export class Dashboard implements OnInit {
+  private readonly service = inject(ProductoService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  cargando = true;
+  error = '';
   kpis = [
-    { titulo: 'Total de Productos en Stock', valor: '450 prendas', etiqueta: '+12%', detalle: 'este mes', icono: 'bi-bag-check', tono: 'verde', tonoEtiqueta: 'verde' },
-    { titulo: 'Valor Comercial', valor: 'S/ 342,800', etiqueta: '+8.4%', detalle: 'este mes', icono: 'bi-cash-stack', tono: 'verde', tonoEtiqueta: 'verde' },
-    { titulo: 'Alertas de Stock Bajo', valor: '14 ítems', etiqueta: 'Crítico', detalle: 'Requiere Acción', icono: 'bi-exclamation-triangle', tono: 'rojo', tonoEtiqueta: 'rojo' },
-    { titulo: 'Movimientos Registrados (Hoy)', valor: '189 movimientos', etiqueta: '+24 nuevo', detalle: 'desde ayer', icono: 'bi-arrow-left-right', tono: 'naranja', tonoEtiqueta: 'verde' },
+    { titulo: 'Productos registrados', valor: '—', etiqueta: 'Base de datos', detalle: 'productos', icono: 'bi-bag-check', tono: 'verde', tonoEtiqueta: 'verde' },
+    { titulo: 'Valor comercial del stock', valor: '—', etiqueta: 'Actual', detalle: 'según precio de venta', icono: 'bi-cash-stack', tono: 'verde', tonoEtiqueta: 'verde' },
+    { titulo: 'Alertas de stock bajo', valor: '—', etiqueta: 'Revisar', detalle: 'variantes bajo mínimo', icono: 'bi-exclamation-triangle', tono: 'rojo', tonoEtiqueta: 'rojo' },
+    { titulo: 'Movimientos de hoy', valor: '—', etiqueta: 'Hoy', detalle: 'registros en MySQL', icono: 'bi-arrow-left-right', tono: 'naranja', tonoEtiqueta: 'verde' },
   ];
+  categorias: { nombre:string; unidades:number; porcentaje:number; color:string }[] = [];
+  alertas: { producto:string; sku:string; talla:string; stock:string; minimo:number }[] = [];
+  transacciones: { titulo:string; detalle:string; color:string }[] = [];
 
-    categorias = [
-    { nombre: 'Calzado Deportivo', unidades: 250, porcentaje: 55, color: '#b4ff00' },
-    { nombre: 'Prendas / Ropa', unidades: 150, porcentaje: 33, color: '#6b7280' },
-    { nombre: 'Accesorios', unidades: 50, porcentaje: 12, color: '#16a34a' },
-  ];
-
-  alertas = [
-    { producto: 'Zapatillas Pegasus 40 - Running', sku: 'NK-PEG40-10', talla: 'US 10', stock: '2 uds', minimo: 15 },
-    { producto: 'Polera de Entrenamiento TechFit', sku: 'AD-TFIT-M', talla: 'M', stock: '1 ud', minimo: 10 },
-  ];
-
-  transacciones = [
-    { titulo: 'Ingreso de Stock Nike', detalle: '+45 unidades ingresadas', color: '#16c26b' },
-    { titulo: 'Salida de Stock Adidas', detalle: '-2 unidades (Boleta #4321)', color: '#f59e0b' },
-  ];
+  get puedeRegistrar(): boolean { try { return ['Administrador', 'Almacén'].includes(JSON.parse(sessionStorage.getItem('emsStoreUser') ?? '{}').rol ?? ''); } catch { return false; } }
+  ngOnInit(): void { this.cargar(); }
+  cargar(): void {
+    this.cargando = true; this.error = '';
+    this.service.obtenerDashboard().subscribe({
+      next: (d: DashboardResumen) => {
+        this.kpis = [
+          { ...this.kpis[0], valor: `${Number(d.totalProductos || 0).toLocaleString('es-PE')}`, detalle: 'productos registrados' },
+          { ...this.kpis[1], valor: this.moneda(Number(d.valorComercial || 0)), detalle: `${Number(d.totalUnidades || 0).toLocaleString('es-PE')} unidades disponibles` },
+          { ...this.kpis[2], valor: `${Number(d.alertasStockBajo || 0)}`, detalle: 'variantes bajo su mínimo' },
+          { ...this.kpis[3], valor: `${Number(d.movimientosHoy || 0)}`, detalle: 'movimientos registrados hoy' },
+        ];
+        const colores = ['#b4ff00','#6b7280','#16a34a','#f59e0b','#38bdf8'];
+        this.categorias = (d.categorias || []).map((c,i) => ({ ...c, color: colores[i % colores.length] }));
+        this.alertas = (d.alertas || []).map(a => ({ producto:a.producto, sku:a.sku, talla:a.talla, stock:`${a.stock} uds`, minimo:a.minimo }));
+        this.transacciones = (d.movimientos || []).map(m => ({ titulo:`${m.tipo === 'entrada' ? 'Entrada' : 'Salida'} · ${m.producto}`, detalle:`${m.tipo === 'entrada' ? '+' : '-'}${m.cantidad} uds · ${m.responsable} · ${m.documento || m.motivo}`, color:m.tipo === 'entrada' ? '#16c26b' : '#f59e0b' }));
+        this.cargando = false;
+        this.cdr.markForCheck();
+      },
+      error: e => { this.error = e?.error?.detail || 'No se pudo cargar el dashboard desde el backend.'; this.cargando = false; this.cdr.markForCheck(); }
+    });
+  }
+  private moneda(v:number): string { return new Intl.NumberFormat('es-PE',{style:'currency',currency:'PEN',maximumFractionDigits:2}).format(v); }
 }

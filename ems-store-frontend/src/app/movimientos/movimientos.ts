@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ProductoService, MovimientoInventario } from '../services/producto';
@@ -7,6 +7,7 @@ interface FilaMovimiento { id: number; fecha: string; tipo: string; clase: strin
 @Component({ selector: 'app-movimientos', imports: [RouterLink, FormsModule], templateUrl: './movimientos.html', styleUrl: './movimientos.scss' })
 export class Movimientos implements OnInit {
   private readonly service = inject(ProductoService);
+  private readonly cdr = inject(ChangeDetectorRef);
   cargando = true;
   error = '';
   busqueda = '';
@@ -41,7 +42,8 @@ export class Movimientos implements OnInit {
           { titulo: 'Ajustes y pérdidas', subtitulo: 'Movimientos no comerciales', insignia: `${ajustes} uds`, valor: `${ajustes} uds`, detalle: `${rows.filter(m => ['ajuste', 'merma'].includes(m.motivo)).length} ajustes o pérdidas registradas.`, icono: 'bi-search', tono: 'naranja' },
         ];
         this.cargando = false;
-      }, error: e => { this.error = e?.error?.detail || 'No se pudo cargar el historial de movimientos.'; this.cargando = false; }
+        this.cdr.markForCheck();
+      }, error: e => { this.error = e?.error?.detail || 'No se pudo cargar el historial de movimientos.'; this.cargando = false; this.cdr.markForCheck(); }
     });
   }
 }

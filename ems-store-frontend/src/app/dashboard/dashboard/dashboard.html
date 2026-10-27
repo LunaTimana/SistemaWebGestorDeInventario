@@ -1,3 +1,5 @@
+@if (error) { <div class="alert alert-danger" role="alert">{{ error }} <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="cargar()">Reintentar</button></div> }
+@if (cargando) { <div class="tarjeta mb-3">Consultando indicadores en la base de datos...</div> }
 <div class="row g-3 mb-3">
   @for (k of kpis; track k.titulo) {
     <div class="col-12 col-sm-6 col-xl-3">
@@ -47,7 +49,7 @@
             <span class="texto-suave">Mín: {{ a.minimo }}</span>
           </div>
         </div>
-      }
+      } @empty { <p class="texto-suave small">No hay alertas de stock mínimo.</p> }
     </section>
   </div>
 
@@ -56,11 +58,9 @@
     <section class="tarjeta">
       <h2 class="titulo-seccion">Accesos Rápidos</h2>
       <div class="d-flex flex-column gap-2">
-        <a class="acceso" routerLink="/registrar-producto">
-          <span class="acceso__icono"><i class="bi bi-plus-lg"></i></span>
-          <span class="flex-grow-1">Registrar Nuevo Producto</span>
-          <i class="bi bi-chevron-right texto-suave"></i>
-        </a>
+        @if (puedeRegistrar) {
+          <a class="acceso" routerLink="/registrar-producto"><span class="acceso__icono"><i class="bi bi-plus-lg"></i></span><span class="flex-grow-1">Registrar Nuevo Producto</span><i class="bi bi-chevron-right texto-suave"></i></a>
+        }
         <a class="acceso" routerLink="/movimientos">
           <span class="acceso__icono"><i class="bi bi-arrow-left-right"></i></span>
           <span class="flex-grow-1">Entradas / Salidas de Stock</span>
@@ -79,7 +79,7 @@
             <div class="texto-suave small">{{ t.detalle }}</div>
           </div>
         </div>
-      }
+      } @empty { <p class="texto-suave small">Todavía no hay movimientos registrados.</p> }
     </section>
   </div>
 </div>

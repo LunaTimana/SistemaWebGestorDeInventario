@@ -43,6 +43,18 @@ export interface Proveedor {
   correo?: string;
 }
 
+
+export interface DashboardResumen {
+  totalProductos: number; totalUnidades: number; valorComercial: number | string;
+  alertasStockBajo: number; movimientosHoy: number;
+  categorias: { nombre: string; unidades: number; porcentaje: number }[];
+  alertas: { sku: string; producto: string; talla: string; stock: number; minimo: number; deficit: number }[];
+  movimientos: { id: number; fecha: string; tipo: string; motivo: string; cantidad: number; sku: string; producto: string; responsable: string; documento?: string; destino_origen?: string }[];
+}
+export interface ResumenAlertas { criticos: number; riesgo: number; total: number; alertas: { varianteId:number; sku:string; producto:string; talla:string; color:string; stock:number; minimo:number; deficit:number; estado:string; ultimoIngreso:string|null }[] }
+export interface ReporteCategoria { categoriaId:number; categoria:string; productos:number; unidades:number; valorVenta:number; valorCosto:number; precioPromedio:number }
+export interface UsuarioSistema { id:number; nombre:string; apellido:string; correo:string; rol:string; estado:'activo'|'inactivo'; ultimaConexion:string|null; fechaCreacion:string|null }
+
 export type ProductoPayload = Omit<Producto, 'id'>;
 export type VariantePayload = Omit<VarianteProducto, 'id'>;
 
@@ -145,4 +157,16 @@ export class ProductoService {
   registrarMovimiento(movimiento: MovimientoPayload): Observable<{ mensaje: string; stockAnterior: number; stockNuevo: number; varianteId: number }> {
     return this.http.post<{ mensaje: string; stockAnterior: number; stockNuevo: number; varianteId: number }>(`${this.apiUrl}/movimientos`, movimiento);
   }
+
+  obtenerDashboard(): Observable<DashboardResumen> { return this.http.get<DashboardResumen>(`${this.apiUrl}/dashboard/resumen`); }
+  obtenerAlertas(): Observable<ResumenAlertas> { return this.http.get<ResumenAlertas>(`${this.apiUrl}/alertas`); }
+  obtenerReporteCategorias(): Observable<ReporteCategoria[]> { return this.http.get<ReporteCategoria[]>(`${this.apiUrl}/reportes/stock-categoria`); }
+  exportarMovimientosExcel(): Observable<Blob> { return this.http.get(`${this.apiUrl}/reportes/movimientos/excel`, { responseType: 'blob' }); }
+  obtenerUsuarios(): Observable<UsuarioSistema[]> { return this.http.get<UsuarioSistema[]>(`${this.apiUrl}/usuarios`); }
+  crearUsuario(usuario: { nombre:string; apellido:string; correo:string; rol:string; contrasena?:string }): Observable<{mensaje:string; contrasenaTemporal:string}> { return this.http.post<{mensaje:string; contrasenaTemporal:string}>(`${this.apiUrl}/usuarios`, usuario); }
+  cambiarRolUsuario(id:number, rol:string): Observable<{mensaje:string}> { return this.http.put<{mensaje:string}>(`${this.apiUrl}/usuarios/${id}/rol`, {rol}); }
+  cambiarEstadoUsuario(id:number, estado:'activo'|'inactivo'): Observable<{mensaje:string}> { return this.http.patch<{mensaje:string}>(`${this.apiUrl}/usuarios/${id}/estado`, {estado}); }
+  obtenerMiCuenta(): Observable<{id:number;nombre:string;apellido:string;correo:string;rol:string;debe_cambiar_contrasena:boolean}> { return this.http.get<any>(`${this.apiUrl}/auth/me`); }
+  actualizarMiCuenta(datos:{nombre:string;apellido:string;correo:string}): Observable<any> { return this.http.put<any>(`${this.apiUrl}/auth/me`,datos); }
+  cambiarMiContrasena(actual:string,nueva:string): Observable<{mensaje:string}> { return this.http.put<{mensaje:string}>(`${this.apiUrl}/auth/me/contrasena`,{actual,nueva}); }
 }

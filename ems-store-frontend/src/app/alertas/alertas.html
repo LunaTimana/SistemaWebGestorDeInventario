@@ -1,54 +1,20 @@
+@if (error) { <div class="alert alert-danger">{{ error }} <button class="btn btn-sm btn-outline-danger ms-2" type="button" (click)="cargar()">Reintentar</button></div> }
+@if (cargando) { <div class="tarjeta mb-3">Consultando existencias reales...</div> }
 <div class="row g-3 mb-3">
   @for (r of resumen; track r.titulo) {
-    <div class="col-12 col-md-4">
-      <article class="tarjeta resumen h-100">
-        <div class="resumen__cabecera">
-          <span>{{ r.titulo }}</span>
-          @if (r.tono !== 'neutro') {
-            <span [class]="'punto ' + r.tono"></span>
-          }
-        </div>
-        <strong [class]="'resumen__valor ' + r.tono">{{ r.valor }}</strong>
-      </article>
-    </div>
+    <div class="col-12 col-md-4"><article class="tarjeta resumen h-100"><div class="resumen__cabecera"><span>{{ r.titulo }}</span>@if (r.tono !== 'neutro') { <span [class]="'punto ' + r.tono"></span> }</div><strong [class]="'resumen__valor ' + r.tono">{{ r.valor }}</strong></article></div>
   }
 </div>
-
 <section class="tarjeta filtros">
-  <button type="button" class="chip activo">Ver Todos</button>
-  <button type="button" class="chip rojo">Sólo Críticos</button>
-  <button type="button" class="chip naranja">Sólo Riesgo</button>
+  <button type="button" class="chip" [class.activo]="filtro==='todos'" (click)="filtro='todos'">Ver Todos</button>
+  <button type="button" class="chip rojo" [class.activo]="filtro==='criticos'" (click)="filtro='criticos'">Sólo Críticos</button>
+  <button type="button" class="chip naranja" [class.activo]="filtro==='riesgo'" (click)="filtro='riesgo'">Sólo Riesgo</button>
 </section>
-
 <section class="tarjeta tabla-tarjeta">
-  <div class="tabla-scroll">
-    <table class="tabla">
-      <thead>
-        <tr>
-          <th>SKU</th>
-          <th>Producto</th>
-          <th>Stock Actual</th>
-          <th>Stock Mínimo</th>
-          <th>Déficit</th>
-          <th>Estado</th>
-          <th>Últ. Ingreso</th>
-          <th>Acción Rápida</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (a of alertas; track a.sku) {
-          <tr>
-            <td class="fuerte">{{ a.sku }}</td>
-            <td class="fuerte">{{ a.producto }}</td>
-            <td class="fuerte">{{ a.stock }}</td>
-            <td class="suave">{{ a.minimo }}</td>
-            <td class="deficit">{{ a.deficit }}</td>
-            <td><span [class]="'estado ' + a.clase">{{ a.estado }}</span></td>
-            <td class="suave">{{ a.ultimoIngreso }}</td>
-            <td><button type="button" class="boton-lima">Pedir Stock</button></td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+  <div class="tabla-scroll"><table class="tabla"><thead><tr><th>SKU</th><th>Producto</th><th>Stock Actual</th><th>Stock Mínimo</th><th>Déficit</th><th>Estado</th><th>Últ. Ingreso</th><th>Acción</th></tr></thead>
+  <tbody>
+    @for (a of alertasFiltradas; track a.varianteId) {
+      <tr><td class="fuerte">{{ a.sku }}</td><td class="fuerte">{{ a.producto }}<div class="suave small">Talla {{ a.talla }}</div></td><td class="fuerte">{{ a.stock }} uds</td><td class="suave">{{ a.minimo }} uds</td><td class="deficit">-{{ a.deficit }} uds</td><td><span [class]="'estado ' + a.clase">{{ a.estado }}</span></td><td class="suave">{{ fecha(a.ultimoIngreso) }}</td><td><a class="boton-lima" [routerLink]="['/movimientos/entrada']" [queryParams]="{ varianteId: a.varianteId }">Registrar entrada</a></td></tr>
+    } @empty { <tr><td colspan="8" class="text-center py-4">No hay alertas para este filtro.</td></tr> }
+  </tbody></table></div>
 </section>

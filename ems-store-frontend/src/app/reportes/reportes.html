@@ -1,62 +1,15 @@
-<section class="tarjeta selector">
-  <strong>Selector Temporal de Datos</strong>
-  <button type="button" class="filtro">
-    Rango: Este Año (2026) <i class="bi bi-calendar3"></i>
-  </button>
-</section>
-
+@if (error) { <div class="alert alert-danger">{{ error }} <button class="btn btn-sm btn-outline-danger ms-2" type="button" (click)="cargar()">Reintentar</button></div> }
+<section class="tarjeta selector d-flex flex-wrap gap-3 align-items-center"><div><strong>Reporte conectado a MySQL</strong><div class="texto-suave small">{{ cargando ? 'Consultando datos...' : totalUnidades + ' unidades' }} · Valor comercial {{ valorTotal | number:'1.2-2' }}</div></div><button type="button" class="filtro" (click)="cargar()"><i class="bi bi-arrow-clockwise"></i> Actualizar</button></section>
 <div class="row g-3">
-  <!-- Reportes disponibles -->
   <div class="col-12 col-lg-5 d-flex flex-column gap-3">
-    @for (r of reportes; track r.titulo) {
-      <article class="tarjeta reporte">
-        <h2 class="reporte__titulo"><i [class]="'bi ' + r.icono"></i> {{ r.titulo }}</h2>
-        <p class="reporte__descripcion">{{ r.descripcion }}</p>
-        <button type="button" [class]="r.principal ? 'boton-negro' : 'boton-claro'">{{ r.boton }}</button>
-      </article>
-    }
+    @for (r of reportes; track r.id) { <article class="tarjeta reporte"><h2 class="reporte__titulo"><i [class]="'bi ' + r.icono"></i> {{ r.titulo }}</h2><p class="reporte__descripcion">{{ r.descripcion }}</p><button type="button" [class]="r.principal ? 'boton-negro' : 'boton-claro'" [disabled]="!!exportando" (click)="generar(r.id)">{{ exportando===r.id ? 'Generando...' : r.boton }}</button></article> }
   </div>
-
-  <!-- Previsualización -->
-  <div class="col-12 col-lg-7">
-    <section class="tarjeta">
-      <div class="previa__cabecera">
-        <h2>Previsualización: Valorización de Stock por Categoría</h2>
-        <small>Datos actualizados al momento</small>
-      </div>
-
-      @for (c of categorias; track c.nombre) {
-        <div class="categoria">
-          <div class="categoria__fila">
-            <strong>{{ c.nombre }}</strong>
-            <strong>{{ c.valor }} ({{ c.porcentaje }}%)</strong>
-          </div>
-          <div class="barra">
-            <div class="barra__relleno" [style.width.%]="c.porcentaje" [style.background]="c.color"></div>
-          </div>
-        </div>
-      }
-
-      <table class="tabla-previa">
-        <thead>
-          <tr>
-            <th>Categoría</th>
-            <th>Items Totales</th>
-            <th>Precio Promedio</th>
-            <th>Valor Estimado</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (d of detalle; track d.categoria) {
-            <tr>
-              <td class="fuerte">{{ d.categoria }}</td>
-              <td>{{ d.items }}</td>
-              <td>{{ d.promedio }}</td>
-              <td class="valor">{{ d.valor }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </section>
-  </div>
+  <div class="col-12 col-lg-7"><section class="tarjeta"><div class="previa__cabecera"><h2>Valorización de stock por categoría</h2><small>Datos actuales de MySQL</small></div>
+    @if (cargando) { <p class="texto-suave">Cargando reporte...</p> }
+    @for (c of categorias; track c.categoriaId) { <div class="categoria"><div class="categoria__fila"><strong>{{ c.categoria }}</strong><strong>{{ c.valorTexto }} ({{ c.porcentaje | number:'1.1-1' }}%)</strong></div><div class="barra" role="progressbar" [attr.aria-valuenow]="c.porcentaje" aria-valuemin="0" aria-valuemax="100" [attr.aria-label]="'Valorización de ' + c.categoria"><div class="barra__relleno" [style.width.%]="c.porcentaje" [style.background-color]="colorPorcentaje(c.porcentaje)"></div></div></div> }
+    <div class="tabla-scroll"><table class="tabla-previa"><thead><tr><th>Categoría</th><th>Productos</th><th>Unidades</th><th>Precio Promedio</th><th>Valor Estimado</th></tr></thead><tbody>
+      @for (c of categorias; track c.categoriaId) { <tr><td class="fuerte">{{ c.categoria }}</td><td>{{ c.productos }}</td><td>{{ c.unidades }}</td><td>{{ c.promedioTexto }}</td><td class="valor">{{ c.valorTexto }}</td></tr> }
+      @empty { <tr><td colspan="5">No hay categorías o productos para mostrar.</td></tr> }
+    </tbody></table></div>
+  </section></div>
 </div>

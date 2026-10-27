@@ -5,6 +5,8 @@ import com.emsstore.backend.repository.ProductoRepository;
 import com.emsstore.backend.repository.VarianteProductoRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,10 +18,12 @@ import java.util.List;
 public class ProductoController {
     private final ProductoRepository repo;
     private final VarianteProductoRepository varianteRepo;
+    private final JdbcTemplate jdbc;
 
-    public ProductoController(ProductoRepository repo, VarianteProductoRepository varianteRepo) {
+    public ProductoController(ProductoRepository repo, VarianteProductoRepository varianteRepo, JdbcTemplate jdbc) {
         this.repo = repo;
         this.varianteRepo = varianteRepo;
+        this.jdbc = jdbc;
     }
 
     @GetMapping
@@ -59,7 +63,7 @@ public class ProductoController {
     @PostMapping("/completo")
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
-    public java.util.Map<String, Object> crearCompleto(@Valid @RequestBody ProductoInventarioRequest request) {
+    public java.util.Map<String, Object> crearCompleto(@Valid @RequestBody ProductoInventarioRequest request, Authentication auth) {
         Producto producto = request.getProducto();
         producto.setId(null);
         Producto guardado = repo.saveAndFlush(producto);
@@ -68,6 +72,11 @@ public class ProductoController {
         variante.setId(null);
         variante.setProductoId(guardado.getId());
         var varianteGuardada = varianteRepo.saveAndFlush(variante);
+        if (varianteGuardada.getStockActual() != null && varianteGuardada.getStockActual() > 0) {
+            Integer userId = (Integer) auth.getPrincipal();
+            jdbc.update("INSERT INTO movimientos_inventario (variante_id,tipo,motivo,cantidad,usuario_id,documento,comentario) VALUES (?,?,?,?,?,?,?)",
+                    varianteGuardada.getId(), "entrada", "ajuste", varianteGuardada.getStockActual(), userId, "Stock inicial", "Registro de stock inicial al crear producto");
+        }
 
         return java.util.Map.of("producto", guardado, "variante", varianteGuardada);
     }
@@ -77,7 +86,7 @@ public class ProductoController {
     public java.util.Map<String, Object> actualizarCompleto(
             @PathVariable Integer id,
             @PathVariable Integer varianteId,
-            @Valid @RequestBody ProductoInventarioRequest request) {
+            @Valid @RequestBody ProductoInventarioRequest request, Authentication auth) {
         Producto actual = obtener(id);
         Producto datos = request.getProducto();
         actual.setNombreModelo(datos.getNombreModelo());
@@ -98,12 +107,21 @@ public class ProductoController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La variante no pertenece al producto indicado");
         }
         var datosVariante = request.getVariante();
+        int stockAnterior = variante.getStockActual() == null ? 0 : variante.getStockActual();
+        int stockNuevo = datosVariante.getStockActual() == null ? 0 : datosVariante.getStockActual();
         variante.setTalla(datosVariante.getTalla());
         variante.setColor(datosVariante.getColor());
         variante.setCodigoUnico(datosVariante.getCodigoUnico());
         variante.setStockActual(datosVariante.getStockActual());
         variante.setStockMinimo(datosVariante.getStockMinimo());
         var varianteGuardada = varianteRepo.saveAndFlush(variante);
+        if (stockAnterior != stockNuevo) {
+            Integer userId = (Integer) auth.getPrincipal();
+            String tipo = stockNuevo > stockAnterior ? "entrada" : "salida";
+            jdbc.update("INSERT INTO movimientos_inventario (variante_id,tipo,motivo,cantidad,usuario_id,documento,comentario) VALUES (?,?,?,?,?,?,?)",
+                    varianteGuardada.getId(), tipo, "ajuste", Math.abs(stockNuevo - stockAnterior), userId, "Ajuste desde edición de producto",
+                    "Stock modificado desde el formulario de edición: " + stockAnterior + " -> " + stockNuevo);
+        }
 
         return java.util.Map.of("producto", guardado, "variante", varianteGuardada);
     }

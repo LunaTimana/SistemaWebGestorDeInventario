@@ -76,6 +76,12 @@
   }
 }
 
+.boton-claro:disabled,
+.boton-negro:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
 .barra-herramientas .boton-negro {
   margin-left: auto;
 }
@@ -180,6 +186,19 @@
 
     &:hover {
       color: var(--ems-texto);
+    }
+  }
+
+  .accion-eliminar {
+    color: #dc2626;
+
+    &:hover:not(:disabled) {
+      color: #991b1b;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: wait;
     }
   }
 }

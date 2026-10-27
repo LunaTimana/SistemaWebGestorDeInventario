@@ -1,99 +1,14 @@
+@if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
+@if (mensaje) { <div class="alert alert-success" role="status">{{ mensaje }} @if (contrasenaTemporal) { <strong> Contraseña temporal: {{ contrasenaTemporal }}</strong> }</div> }
+@if (cargando) { <div class="tarjeta mb-3">Cargando usuarios desde MySQL...</div> }
 <div class="row g-3">
-  <!-- Lista de usuarios -->
   <div class="col-12 col-lg-8">
     <h2 class="titulo-seccion">Usuarios Registrados</h2>
-
-    <section class="tarjeta tabla-tarjeta mb-3">
-      <div class="tabla-scroll">
-        <table class="tabla">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Correo Electrónico</th>
-              <th>Rol</th>
-              <th>Estado</th>
-              <th>Última Conexión</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (u of usuarios; track u.correo) {
-              <tr [class.seleccionada]="u === seleccionado">
-                <td class="fuerte">{{ u.nombre }}</td>
-                <td class="suave">{{ u.correo }}</td>
-                <td><span [class]="'rol ' + u.claseRol">{{ u.rol }}</span></td>
-                <td>
-                  <span class="estado">
-                    <span [class]="'punto ' + u.claseEstado"></span>{{ u.estado }}
-                  </span>
-                </td>
-                <td class="suave">{{ u.conexion }}</td>
-                <td class="acciones">
-                  <button type="button" class="accion accion--editar">Editar rol</button>
-                  <button type="button" class="accion accion--desactivar">Desactivar</button>
-                </td>
-              </tr>       
-            }
-          </tbody>
-        </table>
-      </div>
-    </section>
-        <section class="tarjeta editar-rol">
-      <h2 class="titulo-formulario">Editar Rol</h2>
-      <p class="subtitulo">Cambia el rol de un usuario existente sin salir de esta pantalla.</p>
-
-      <span class="etiqueta">Usuario seleccionado</span>
-      <div class="usuario-seleccionado">
-        <strong>{{ seleccionado.nombre }}</strong>
-        <small>{{ seleccionado.correo }}</small>
-      </div>
-
-      <span class="etiqueta">Rol actual</span>
-      <span [class]="'rol ' + seleccionado.claseRol">{{ seleccionado.rol }}</span>
-
-      <label for="nuevo-rol">Nuevo rol</label>
-      <select id="nuevo-rol">
-        @for (r of rolesDisponibles; track r) {
-          <option [selected]="r === nuevoRol">{{ r }}</option>
-        }
-      </select>
-
-      <div class="confirmacion">
-        <small>Confirmación</small>
-        <p>El cambio se aplicará solo al usuario seleccionado y no afectará su correo ni su estado actual.</p>
-      </div>
-
-      <button type="button" class="boton-lima">Confirmar cambio de rol</button>
-      <button type="button" class="boton-borde">Cancelar</button>
-    </section>
+    <section class="tarjeta tabla-tarjeta mb-3"><div class="tabla-scroll"><table class="tabla"><thead><tr><th>Nombre</th><th>Correo Electrónico</th><th>Rol</th><th>Estado</th><th>Última Conexión</th><th>Acciones</th></tr></thead><tbody>
+      @for (u of usuarios; track u.id) { <tr [class.seleccionada]="u.id===seleccionado?.id"><td class="fuerte">{{ u.nombre }} {{ u.apellido }}</td><td class="suave">{{ u.correo }}</td><td><span [class]="'rol ' + claseRol(u.rol)">{{ u.rol }}</span></td><td><span class="estado"><span [class]="'punto ' + claseEstado(u.estado)"></span>{{ u.estado==='activo'?'Activo':'Inactivo' }}</span></td><td class="suave">{{ fecha(u.ultimaConexion) }}</td><td class="acciones"><button type="button" class="accion accion--editar" (click)="seleccionar(u)">Editar rol</button><button type="button" class="accion accion--desactivar" (click)="alternarEstado(u)">{{ u.estado==='activo'?'Desactivar':'Activar' }}</button></td></tr> }
+      @empty { <tr><td colspan="6" class="text-center py-4">No hay usuarios registrados.</td></tr> }
+    </tbody></table></div></section>
+    @if (seleccionado) { <section class="tarjeta editar-rol"><h2 class="titulo-formulario">Editar Rol</h2><p class="subtitulo">El cambio se guarda en la base de datos.</p><span class="etiqueta">Usuario seleccionado</span><div class="usuario-seleccionado"><strong>{{ seleccionado.nombre }} {{ seleccionado.apellido }}</strong><small>{{ seleccionado.correo }}</small></div><span class="etiqueta">Rol actual</span><span [class]="'rol ' + claseRol(seleccionado.rol)">{{ seleccionado.rol }}</span><label for="nuevo-rol">Nuevo rol</label><select id="nuevo-rol" [(ngModel)]="nuevoRol">@for (r of rolesDisponibles; track r) { <option [value]="r">{{ r }}</option> }</select><div class="confirmacion"><small>Confirmación</small><p>El cambio afectará los permisos del usuario.</p></div><button type="button" class="boton-lima" [disabled]="guardando || nuevoRol===seleccionado.rol" (click)="guardarRol()">{{ guardando?'Guardando...':'Confirmar cambio de rol' }}</button></section> }
   </div>
-
-
-  <!-- Nuevo usuario -->
-  <div class="col-12 col-lg-4">
-    <form class="tarjeta">
-      <h2 class="titulo-formulario">Nuevo Usuario Rápido</h2>
-
-      <label for="nombre">Nombre Completo *</label>
-      <input id="nombre" type="text" placeholder="Ej. Pedro Picapiedra" />
-
-      <label for="correo">Correo Electrónico *</label>
-      <input id="correo" type="text" placeholder="ejemplo@emsstore.com" />
-
-      <label for="rol">Asignar Rol *</label>
-      <select id="rol">
-        <option>Administrador</option>
-        <option selected>Almacén</option>
-        <option>Ventas</option>
-      </select>
-
-      <div class="clave-temporal">
-        <small>Contraseña Temporal</small>
-        <strong>EMSStoreTemp2026</strong>
-      </div>
-
-      <button type="button" class="boton-lima">Crear Usuario</button>
-    </form>
-  </div>
+  <div class="col-12 col-lg-4"><form class="tarjeta" (ngSubmit)="crearUsuario()"><h2 class="titulo-formulario">Nuevo Usuario</h2><label for="nombre-completo">Nombre y apellidos *</label><input id="nombre-completo" name="nombreCompleto" type="text" [(ngModel)]="nombreCompleto" required placeholder="Ej. Pedro Picapiedra"/><label for="correo-usuario">Correo electrónico *</label><input id="correo-usuario" name="correo" type="email" [(ngModel)]="correo" required placeholder="ejemplo@emsstore.com"/><label for="rol-nuevo">Asignar rol *</label><select id="rol-nuevo" name="rolNuevo" [(ngModel)]="rolNuevo">@for (r of rolesDisponibles; track r) { <option [value]="r">{{ r }}</option> }</select><div class="clave-temporal"><small>Contraseña temporal</small><strong>EMSStoreTemp2026</strong><p class="small mb-0">Debe cambiarse al configurar el acceso.</p></div><button type="submit" class="boton-lima" [disabled]="guardando">{{ guardando?'Guardando...':'Crear usuario' }}</button></form></div>
 </div>
-

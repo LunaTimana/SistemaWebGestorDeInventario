@@ -1,114 +1,16 @@
+@if (error) { <div class="alert alert-danger">{{ error }}</div> }
+@if (mensaje) { <div class="alert alert-success">{{ mensaje }}</div> }
+@if (cargando) { <div class="tarjeta mb-3">Cargando los datos de tu cuenta...</div> }
 <div class="row g-3">
-  <!-- Formulario -->
-  <div class="col-12 col-lg-8">
-    <form class="tarjeta">
-      <h2 class="titulo-formulario">Datos personales</h2>
-      <p class="subtitulo">Revisa y actualiza la información de tu cuenta.</p>
-
-      <div class="row g-3">
-        <div class="col-12 col-md-6">
-          <label for="nombre">Nombre *</label>
-          <input id="nombre" type="text" [value]="usuario.nombre" />
-        </div>
-        <div class="col-12 col-md-6">
-          <label for="apellido">Apellido *</label>
-          <input id="apellido" type="text" [value]="usuario.apellido" />
-        </div>
-        <div class="col-12">
-          <label for="correo">Correo electrónico</label>
-          <input id="correo" type="text" placeholder="Ingresa tu correo electrónico" />
-          <small class="ayuda">Usa un correo al que tengas acceso.</small>
-        </div>
-      </div>
-
-      <hr class="separador" />
-
-      <h2 class="titulo-formulario">Cambiar contraseña</h2>
-      <p class="subtitulo">Deja estos campos vacíos si no deseas cambiar tu contraseña.</p>
-
-      <div class="row g-3">
-        <div class="col-12">
-          <label for="actual">Contraseña actual</label>
-          <div class="campo-clave">
-            <input id="actual" type="password" placeholder="Ingresa tu contraseña actual" />
-            <button type="button" aria-label="Mostrar contraseña"><i class="bi bi-eye-slash"></i></button>
-          </div>
-        </div>
-        <div class="col-12 col-md-6">
-          <label for="nueva">Nueva contraseña</label>
-          <div class="campo-clave">
-            <input id="nueva" type="password" placeholder="Ingresa una nueva contraseña" />
-            <button type="button" aria-label="Mostrar contraseña"><i class="bi bi-eye-slash"></i></button>
-          </div>
-        </div>
-        <div class="col-12 col-md-6">
-          <label for="confirmar">Confirmar nueva contraseña</label>
-          <div class="campo-clave">
-            <input id="confirmar" type="password" placeholder="Repite la nueva contraseña" />
-            <button type="button" aria-label="Mostrar contraseña"><i class="bi bi-eye-slash"></i></button>
-          </div>
-        </div>
-        <div class="col-12">
-          <small class="ayuda">Usa al menos 8 caracteres, una mayúscula, una minúscula y un número.</small>
-        </div>
-      </div>
-
-      <hr class="separador" />
-
-      <div class="acciones-formulario">
-        <button type="button" class="boton-lima">Guardar cambios</button>
-        <a class="boton-claro" routerLink="/dashboard">Cancelar</a>
-      </div>
+  <div class="col-12 col-lg-8 d-flex flex-column gap-3">
+    <form class="tarjeta" (ngSubmit)="guardarDatos()"><h2 class="titulo-formulario">Datos personales</h2><p class="subtitulo">La información se guarda en MySQL.</p>
+      <div class="row g-3"><div class="col-12 col-md-6"><label for="nombre">Nombre *</label><input id="nombre" name="nombre" type="text" [(ngModel)]="formulario.nombre" required /></div><div class="col-12 col-md-6"><label for="apellido">Apellido *</label><input id="apellido" name="apellido" type="text" [(ngModel)]="formulario.apellido" required /></div><div class="col-12"><label for="correo">Correo electrónico *</label><input id="correo" name="correo" type="email" [(ngModel)]="formulario.correo" required /><small class="ayuda">Usa un correo al que tengas acceso.</small></div></div>
+      <div class="acciones-formulario mt-3"><button type="submit" class="boton-lima" [disabled]="guardando">Guardar datos</button><a class="boton-claro" routerLink="/dashboard">Cancelar</a></div>
+    </form>
+    <form class="tarjeta" (ngSubmit)="cambiarContrasena()"><h2 class="titulo-formulario">Cambiar contraseña</h2><p class="subtitulo">Se valida tu contraseña actual antes de guardar la nueva.</p>
+      <div class="row g-3"><div class="col-12"><label for="actual">Contraseña actual</label><div class="campo-clave"><input id="actual" name="actual" [type]="mostrar.actual?'text':'password'" [(ngModel)]="claves.actual" required /><button type="button" aria-label="Mostrar contraseña actual" (click)="mostrar.actual=!mostrar.actual"><i [class]="mostrar.actual?'bi bi-eye':'bi bi-eye-slash'"></i></button></div></div><div class="col-12 col-md-6"><label for="nueva">Nueva contraseña</label><div class="campo-clave"><input id="nueva" name="nueva" [type]="mostrar.nueva?'text':'password'" [(ngModel)]="claves.nueva" required /><button type="button" aria-label="Mostrar nueva contraseña" (click)="mostrar.nueva=!mostrar.nueva"><i [class]="mostrar.nueva?'bi bi-eye':'bi bi-eye-slash'"></i></button></div></div><div class="col-12 col-md-6"><label for="confirmar">Confirmar nueva contraseña</label><div class="campo-clave"><input id="confirmar" name="confirmar" [type]="mostrar.confirmar?'text':'password'" [(ngModel)]="claves.confirmar" required /><button type="button" aria-label="Mostrar confirmación" (click)="mostrar.confirmar=!mostrar.confirmar"><i [class]="mostrar.confirmar?'bi bi-eye':'bi bi-eye-slash'"></i></button></div></div><div class="col-12"><small class="ayuda">Mínimo 8 caracteres, mayúscula, minúscula y número.</small></div></div>
+      <div class="acciones-formulario mt-3"><button type="submit" class="boton-lima" [disabled]="guardando">Actualizar contraseña</button></div>
     </form>
   </div>
-
-  <!-- Columna derecha -->
-  <div class="col-12 col-lg-4 d-flex flex-column gap-3">
-    <section class="tarjeta">
-      <h3 class="titulo-formulario">Mi cuenta</h3>
-
-      <div class="perfil">
-        <span class="avatar">{{ usuario.iniciales }}</span>
-        <div class="perfil__texto">
-          <strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong>
-          <small>EMS Store</small>
-        </div>
-      </div>
-
-      <div class="dato">
-        <small>Rol asignado</small>
-        <strong>{{ usuario.rol }}</strong>
-      </div>
-      <div class="dato">
-        <small>Sucursal</small>
-        <strong>{{ usuario.sucursal }}</strong>
-      </div>
-
-      <p class="nota">
-        <i class="bi bi-lock"></i>
-        El rol y la sucursal son administrados desde Gestión de Usuarios.
-      </p>
-
-      <hr class="separador" />
-
-      <div class="sesion-cuenta">
-        <div>
-          <strong>Cerrar sesión</strong>
-          <p>Finaliza tu sesión de forma segura en este dispositivo.</p>
-        </div>
-        <button type="button" class="boton-cerrar-sesion" (click)="cerrarSesion()">
-          <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-          Cerrar sesión
-        </button>
-      </div>
-    </section>
-
-    <section class="tarjeta consejo">
-      <span class="consejo__icono"><i class="bi bi-shield-check"></i></span>
-      <div>
-        <strong>Protege tu cuenta</strong>
-        <p>Elige una contraseña única y no la compartas. Evita usar tu nombre o datos fáciles de adivinar.</p>
-      </div>
-    </section>
-  </div>
+  <div class="col-12 col-lg-4 d-flex flex-column gap-3"><section class="tarjeta"><h3 class="titulo-formulario">Mi cuenta</h3><div class="perfil"><span class="avatar">{{ usuario.iniciales }}</span><div class="perfil__texto"><strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong><small>{{ usuario.correo }}</small></div></div><div class="dato"><small>Rol asignado</small><strong>{{ usuario.rol }}</strong></div><div class="dato"><small>Sucursal</small><strong>{{ usuario.sucursal }}</strong></div><p class="nota"><i class="bi bi-lock"></i> El rol se administra desde Gestión de Usuarios.</p><hr class="separador"/><div class="sesion-cuenta"><div><strong>Cerrar sesión</strong><p>Finaliza tu sesión de forma segura en este dispositivo.</p></div><button type="button" class="boton-cerrar-sesion" (click)="cerrarSesion()"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión</button></div></section><section class="tarjeta consejo"><span class="consejo__icono"><i class="bi bi-shield-check"></i></span><div><strong>Protege tu cuenta</strong><p>Elige una contraseña única y no la compartas.</p></div></section></div>
 </div>

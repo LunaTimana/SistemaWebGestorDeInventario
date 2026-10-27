@@ -27,7 +27,7 @@
             <span class="estado">{{ producto.estado }}</span>
           </div>
 
-          <a class="boton-negro" [routerLink]="['/inventario/editar', producto.sku]">Editar producto</a>
+          @if (puedeEditar) { <a class="boton-negro" [routerLink]="['/inventario/editar', producto.sku]">Editar producto</a> }
           <a class="boton-claro ms-2" routerLink="/inventario">Volver al inventario</a>
         </div>
       </section>
@@ -36,9 +36,14 @@
     <div class="col-12 col-lg-4">
       <section class="tarjeta">
         <h3 class="titulo-seccion">Historial de movimientos</h3>
-        <p class="text-muted mb-0">
-          El detalle del producto ya se consulta desde la base de datos. El historial aparecerá aquí cuando se habilite el registro de movimientos en el backend.
-        </p>
+        @for (m of historial; track m.fecha + m.titulo) {
+          <div class="d-flex justify-content-between align-items-start gap-2 py-2 border-bottom">
+            <div><strong>{{ m.titulo }}</strong><div class="text-muted small">{{ m.fecha }}</div></div>
+            <strong [class.text-success]="m.clase==='verde'" [class.text-danger]="m.clase==='rojo'">{{ m.cantidad }}</strong>
+          </div>
+        } @empty {
+          <p class="text-muted mb-0">Este SKU todavía no tiene movimientos registrados.</p>
+        }
       </section>
     </div>
   </div>

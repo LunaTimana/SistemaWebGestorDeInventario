@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import { Categoria, Marca, ProductoService, VarianteProducto } from '../../services/producto';
+import { Categoria, Marca, ProductoService, VarianteProducto, MovimientoInventario } from '../../services/producto';
 
 @Component({
   selector: 'app-detalle-producto',
@@ -33,15 +33,18 @@ export class DetalleProducto implements OnInit {
     private readonly cdr: ChangeDetectorRef
   ) {}
 
+  get puedeEditar(): boolean { try { return ['Administrador', 'Almacén'].includes(JSON.parse(sessionStorage.getItem('emsStoreUser') ?? '{}').rol ?? ''); } catch { return false; } }
+
   ngOnInit(): void {
     const sku = this.route.snapshot.paramMap.get('id') ?? '';
     forkJoin({
       productos: this.productoService.obtenerProductos(),
       variantes: this.productoService.obtenerVariantes(),
       categorias: this.productoService.obtenerCategorias(),
-      marcas: this.productoService.obtenerMarcas()
+      marcas: this.productoService.obtenerMarcas(),
+      movimientos: this.productoService.obtenerMovimientos()
     }).subscribe({
-      next: ({ productos, variantes, categorias, marcas }) => {
+      next: ({ productos, variantes, categorias, marcas, movimientos }) => {
         const variante: VarianteProducto | undefined = variantes.find(v => v.codigoUnico === sku);
         if (!variante) {
           this.error = `No se encontró el producto con SKU ${sku}.`;
@@ -54,6 +57,12 @@ export class DetalleProducto implements OnInit {
             const marca: Marca | undefined = marcas.find(m => m.id === base.marcaId);
             const stock = Number(variante.stockActual ?? 0);
             const minimo = Number(variante.stockMinimo ?? 0);
+            this.historial = (movimientos as MovimientoInventario[]).filter(m => m.sku === variante.codigoUnico).slice(0, 8).map(m => ({
+              titulo: `${m.tipo === 'entrada' ? 'Entrada' : 'Salida'} · ${m.motivo}`,
+              fecha: new Date(m.fecha).toLocaleString('es-PE'),
+              cantidad: `${m.tipo === 'entrada' ? '+' : '-'}${m.cantidad} uds`,
+              clase: m.tipo === 'entrada' ? 'verde' : 'rojo'
+            }));
             this.producto = {
               marca: marca?.nombre ?? `Marca #${base.marcaId}`,
               nombre: base.nombreModelo,

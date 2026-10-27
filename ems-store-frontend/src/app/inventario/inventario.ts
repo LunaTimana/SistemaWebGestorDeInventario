@@ -53,6 +53,10 @@ export class Inventario implements OnInit {
     private readonly cdr: ChangeDetectorRef
   ) {}
 
+  get puedeEditar(): boolean { return ['Administrador', 'Almacén'].includes(this.rolActual()); }
+  get puedeEliminar(): boolean { return this.rolActual() === 'Administrador'; }
+  private rolActual(): string { try { return JSON.parse(sessionStorage.getItem('emsStoreUser') ?? '{}').rol ?? ''; } catch { return ''; } }
+
   ngOnInit(): void {
     this.cargarInventario();
   }

@@ -1,6 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ProductoService, Producto, VarianteProducto, Proveedor } from '../../services/producto';
 
@@ -8,7 +8,9 @@ interface OpcionVariante extends VarianteProducto { etiqueta: string; nombreProd
 @Component({ selector: 'app-registrar-entrada', imports: [RouterLink, FormsModule], templateUrl: './registrar-entrada.html', styleUrl: './registrar-entrada.scss' })
 export class RegistrarEntrada implements OnInit {
   private readonly service = inject(ProductoService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   variantes: OpcionVariante[] = [];
   proveedores: Proveedor[] = [];
   varianteId: number | null = null;
@@ -25,8 +27,12 @@ export class RegistrarEntrada implements OnInit {
     forkJoin({ productos: this.service.obtenerProductos(), variantes: this.service.obtenerVariantes(), proveedores: this.service.obtenerProveedores() }).subscribe({
       next: ({ productos, variantes, proveedores }) => {
         this.variantes = variantes.map(v => ({ ...v, nombreProducto: productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`, etiqueta: `${v.codigoUnico} · ${productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`} · ${v.talla}/${v.color} (stock: ${v.stockActual})` }));
-        this.proveedores = proveedores; this.cargando = false;
-      }, error: () => { this.error = 'No se pudieron cargar productos y proveedores.'; this.cargando = false; }
+        this.proveedores = proveedores;
+        const varianteSolicitada = Number(this.route.snapshot.queryParamMap.get('varianteId'));
+        if (varianteSolicitada && this.variantes.some(v => v.id === varianteSolicitada)) this.varianteId = varianteSolicitada;
+        this.cargando = false;
+        this.cdr.markForCheck();
+      }, error: () => { this.error = 'No se pudieron cargar productos y proveedores.'; this.cargando = false; this.cdr.markForCheck(); }
     });
   }
   get varianteSeleccionada(): OpcionVariante | undefined { return this.variantes.find(v => v.id === Number(this.varianteId)); }

@@ -5,7 +5,7 @@
     </div>
 
     <nav class="sidebar__nav">
-      @for (item of menu; track item.ruta) {
+      @for (item of menu(); track item.ruta) {
       <a class="nav-ems" [routerLink]="['/', item.ruta]" routerLinkActive="activo" (click)="menuAbierto.set(false)">
         <span class="nav-ems__icono"><i [class]="'bi ' + item.icono"></i></span>
         <span class="nav-ems__texto">

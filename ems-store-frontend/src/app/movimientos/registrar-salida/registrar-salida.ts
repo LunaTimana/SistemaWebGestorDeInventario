@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -8,6 +8,7 @@ interface OpcionVariante extends VarianteProducto { etiqueta: string; }
 @Component({ selector: 'app-registrar-salida', imports: [RouterLink, FormsModule], templateUrl: './registrar-salida.html', styleUrl: './registrar-salida.scss' })
 export class RegistrarSalida implements OnInit {
   private readonly service = inject(ProductoService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
   variantes: OpcionVariante[] = [];
   varianteId: number | null = null;
@@ -21,8 +22,8 @@ export class RegistrarSalida implements OnInit {
   error = '';
   ngOnInit(): void {
     forkJoin({ productos: this.service.obtenerProductos(), variantes: this.service.obtenerVariantes() }).subscribe({
-      next: ({ productos, variantes }) => { this.variantes = variantes.map(v => ({ ...v, etiqueta: `${v.codigoUnico} · ${productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`} · ${v.talla}/${v.color} (stock: ${v.stockActual})` })); this.cargando = false; },
-      error: () => { this.error = 'No se pudieron cargar las variantes.'; this.cargando = false; }
+      next: ({ productos, variantes }) => { this.variantes = variantes.map(v => ({ ...v, etiqueta: `${v.codigoUnico} · ${productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`} · ${v.talla}/${v.color} (stock: ${v.stockActual})` })); this.cargando = false; this.cdr.markForCheck(); },
+      error: () => { this.error = 'No se pudieron cargar las variantes.'; this.cargando = false; this.cdr.markForCheck(); }
     });
   }
   get varianteSeleccionada(): OpcionVariante | undefined { return this.variantes.find(v => v.id === Number(this.varianteId)); }
