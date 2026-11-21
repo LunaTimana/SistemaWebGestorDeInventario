@@ -17,7 +17,7 @@ public class AlertaController {
     @GetMapping
     public Map<String,Object> listar() {
         List<Map<String,Object>> items = jdbc.queryForList("""
-            SELECT v.id AS varianteId,v.codigo_unico AS sku,p.nombre_modelo AS producto,v.talla,v.color,
+            SELECT v.id AS varianteId,v.codigo_unico AS sku,p.nombre_modelo AS producto,v.talla,v.genero,v.color,
                    v.stock_actual AS stock,v.stock_minimo AS minimo,
                    GREATEST(v.stock_minimo-v.stock_actual,0) AS deficit,
                    CASE WHEN v.stock_actual=0 THEN 'CRÍTICO' ELSE 'RIESGO' END AS estado,

@@ -19,6 +19,7 @@ export interface VarianteProducto {
   id: number;
   productoId: number;
   talla: string;
+  genero: string;
   color: string;
   codigoUnico: string;
   stockActual: number;
@@ -51,7 +52,7 @@ export interface DashboardResumen {
   alertas: { sku: string; producto: string; talla: string; stock: number; minimo: number; deficit: number }[];
   movimientos: { id: number; fecha: string; tipo: string; motivo: string; cantidad: number; sku: string; producto: string; responsable: string; documento?: string; destino_origen?: string }[];
 }
-export interface ResumenAlertas { criticos: number; riesgo: number; total: number; alertas: { varianteId:number; sku:string; producto:string; talla:string; color:string; stock:number; minimo:number; deficit:number; estado:string; ultimoIngreso:string|null }[] }
+export interface ResumenAlertas { criticos: number; riesgo: number; total: number; alertas: { varianteId:number; sku:string; producto:string; talla:string; genero:string; color:string; stock:number; minimo:number; deficit:number; estado:string; ultimoIngreso:string|null }[] }
 export interface ReporteCategoria { categoriaId:number; categoria:string; productos:number; unidades:number; valorVenta:number; valorCosto:number; precioPromedio:number }
 export interface UsuarioSistema { id:number; nombre:string; apellido:string; correo:string; rol:string; estado:'activo'|'inactivo'; ultimaConexion:string|null; fechaCreacion:string|null }
 
@@ -60,7 +61,7 @@ export type VariantePayload = Omit<VarianteProducto, 'id'>;
 
 export interface MovimientoInventario {
   id: number; fecha: string; tipo: 'entrada' | 'salida'; motivo: string; cantidad: number;
-  documento: string; destinoOrigen: string; comentario: string; sku: string; talla: string; color: string;
+  documento: string; destinoOrigen: string; comentario: string; sku: string; talla: string; genero: string; color: string;
   producto: string; responsable: string; proveedor: string;
 }
 
@@ -143,6 +144,9 @@ export class ProductoService {
   exportarInventarioExcel(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/inventario/exportar/excel`, { responseType: 'blob' });
   }
+  exportarInventarioPdf(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reportes/inventario/pdf`, { responseType: 'blob' });
+  }
 
   importarInventarioExcel(archivo: File): Observable<{ mensaje: string; filasActualizadas: number; movimientosRegistrados: number; filasOmitidas: number; errores: string[] }> {
     const form = new FormData();
@@ -162,6 +166,7 @@ export class ProductoService {
   obtenerAlertas(): Observable<ResumenAlertas> { return this.http.get<ResumenAlertas>(`${this.apiUrl}/alertas`); }
   obtenerReporteCategorias(): Observable<ReporteCategoria[]> { return this.http.get<ReporteCategoria[]>(`${this.apiUrl}/reportes/stock-categoria`); }
   exportarMovimientosExcel(): Observable<Blob> { return this.http.get(`${this.apiUrl}/reportes/movimientos/excel`, { responseType: 'blob' }); }
+  exportarMovimientosPdf(): Observable<Blob> { return this.http.get(`${this.apiUrl}/reportes/movimientos/pdf`, { responseType: 'blob' }); }
   obtenerUsuarios(): Observable<UsuarioSistema[]> { return this.http.get<UsuarioSistema[]>(`${this.apiUrl}/usuarios`); }
   crearUsuario(usuario: { nombre:string; apellido:string; correo:string; rol:string; contrasena?:string }): Observable<{mensaje:string; contrasenaTemporal:string}> { return this.http.post<{mensaje:string; contrasenaTemporal:string}>(`${this.apiUrl}/usuarios`, usuario); }
   cambiarRolUsuario(id:number, rol:string): Observable<{mensaje:string}> { return this.http.put<{mensaje:string}>(`${this.apiUrl}/usuarios/${id}/rol`, {rol}); }

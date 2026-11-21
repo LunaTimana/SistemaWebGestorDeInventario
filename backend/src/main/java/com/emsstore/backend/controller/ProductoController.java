@@ -68,7 +68,7 @@ public class ProductoController {
         producto.setId(null);
         Producto guardado = repo.saveAndFlush(producto);
 
-        var variante = request.getVariante();
+        var variante = request.getVariante().toEntity();
         variante.setId(null);
         variante.setProductoId(guardado.getId());
         var varianteGuardada = varianteRepo.saveAndFlush(variante);
@@ -110,6 +110,7 @@ public class ProductoController {
         int stockAnterior = variante.getStockActual() == null ? 0 : variante.getStockActual();
         int stockNuevo = datosVariante.getStockActual() == null ? 0 : datosVariante.getStockActual();
         variante.setTalla(datosVariante.getTalla());
+        variante.setGenero(datosVariante.getGenero());
         variante.setColor(datosVariante.getColor());
         variante.setCodigoUnico(datosVariante.getCodigoUnico());
         variante.setStockActual(datosVariante.getStockActual());

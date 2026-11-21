@@ -13,28 +13,50 @@
 
   <select class="filtro" aria-label="Talla" [(ngModel)]="tallaSeleccionada">
     <option value="">Talla: Todas</option>
+    <option value="XS">XS</option>
     <option value="S">S</option>
     <option value="M">M</option>
     <option value="L">L</option>
     <option value="XL">XL</option>
+    <option value="XXL">XXL</option>
+    <option value="4">Niños 4</option>
+    <option value="6">Niños 6</option>
+    <option value="8">Niños 8</option>
+    <option value="10">Niños 10</option>
+    <option value="12">Niños 12</option>
+    <option value="14">Niños 14</option>
+    <option value="16">Niños 16</option>
     <option value="42">42</option>
     <option value="43">43</option>
   </select>
 
-  <input #archivoExcel type="file" accept=".xlsx" hidden (change)="importarExcel($event)" />
-  <button type="button" class="boton-claro" (click)="archivoExcel.click()" [disabled]="importandoExcel">
-    <i class="bi bi-file-earmark-arrow-up"></i>
-    {{ importandoExcel ? 'Importando Excel...' : 'Importar Excel' }}
-  </button>
+  <select class="filtro" aria-label="Género" [(ngModel)]="generoSeleccionado">
+    <option value="">Género: Todos</option>
+    <option value="Hombre">Hombre</option>
+    <option value="Mujer">Mujer</option>
+    <option value="Niños">Niños</option>
+  </select>
 
-  <button type="button" class="boton-claro" (click)="exportarExcel()" [disabled]="exportandoExcel">
-    <i class="bi bi-file-earmark-excel"></i>
-    {{ exportandoExcel ? 'Generando Excel...' : 'Exportar Excel' }}
-  </button>
+  @if (puedeEditar) {
+    <input #archivoExcel type="file" accept=".xlsx" hidden (change)="importarExcel($event)" />
+    <button type="button" class="boton-claro" (click)="archivoExcel.click()" [disabled]="importandoExcel">
+      <i class="bi bi-file-earmark-arrow-up"></i>
+      {{ importandoExcel ? 'Importando Excel...' : 'Importar Excel' }}
+    </button>
+  }
 
-  <a class="boton-negro" routerLink="/registrar-producto">
-    <i class="bi bi-plus-lg"></i> Registrar Producto
-  </a>
+  @if (puedeEditar) {
+    <button type="button" class="boton-claro" (click)="exportarExcel()" [disabled]="exportandoExcel">
+      <i class="bi bi-file-earmark-excel"></i>
+      {{ exportandoExcel ? 'Generando Excel...' : 'Exportar Excel' }}
+    </button>
+  }
+
+  @if (puedeEditar) {
+    <a class="boton-negro" routerLink="/registrar-producto">
+      <i class="bi bi-plus-lg"></i> Registrar Producto
+    </a>
+  }
 </section>
 
 @if (cargando) {
@@ -57,6 +79,7 @@
           <th>Nombre del Producto</th>
           <th>Categoría</th>
           <th>Talla</th>
+          <th>Género</th>
           <th>Color</th>
           <th>Stock</th>
           <th>Precio</th>
@@ -72,6 +95,7 @@
             <td class="nombre">{{ p.nombre }}</td>
             <td class="suave">{{ p.categoria }}</td>
             <td class="fuerte">{{ p.talla }}</td>
+            <td class="suave">{{ p.genero }}</td>
             <td class="suave">{{ p.color }}</td>
             <td class="fuerte" [class.critico]="p.stock === 0">{{ p.stock }} uds</td>
             <td class="precio">S/ {{ p.precio.toFixed(2) }}</td>
@@ -98,7 +122,7 @@
         } @empty {
           @if (!cargando) {
             <tr>
-              <td colspan="10" class="text-center p-4">
+              <td colspan="11" class="text-center p-4">
                 No se encontraron productos con esos filtros.
               </td>
             </tr>

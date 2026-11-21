@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String, Object> iniciarSesion(@RequestBody LoginRequest request) {
+    public Map<String, Object> iniciarSesion(@Valid @RequestBody LoginRequest request) {
         if (request == null || request.correo() == null || request.contrasena() == null
                 || request.correo().isBlank() || request.contrasena().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Debes ingresar correo y contraseña.");
@@ -89,16 +90,16 @@ public class AuthController {
         List<String> hashes = jdbcTemplate.query("SELECT contrasena_hash FROM usuarios WHERE id=? AND estado='activo'", (rs,n)->rs.getString(1), id);
         if (hashes.isEmpty() || !passwordEncoder.matches(datos.actual(), hashes.get(0)))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La contraseña actual no es correcta.");
-        if (!datos.nueva().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.");
+        if (!datos.nueva().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,72}$"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La clave debe incluir 8-72 caracteres, mayuscula, minuscula, numero y simbolo.");
         jdbcTemplate.update("UPDATE usuarios SET contrasena_hash=?,debe_cambiar_contrasena=FALSE WHERE id=?", passwordEncoder.encode(datos.nueva()), id);
         return Map.of("mensaje","Contraseña actualizada correctamente.");
     }
 
     public record DatosCuenta(@NotBlank String nombre, @NotBlank String apellido, @NotBlank @Email String correo) {}
-    public record CambioContrasena(@NotBlank String actual, @NotBlank String nueva) {}
+    public record CambioContrasena(@NotBlank @Size(max = 72) String actual, @NotBlank @Size(max = 72) String nueva) {}
 
-    public record LoginRequest(String correo, String contrasena) {}
+    public record LoginRequest(@NotBlank @Email @Size(max = 254) String correo, @NotBlank @Size(max = 72) String contrasena) {}
     private record UsuarioConHash(Integer id, String nombre, String apellido, String correo,
             String hash, boolean debeCambiarContrasena, String rol) {}
 }

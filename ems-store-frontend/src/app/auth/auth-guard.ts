@@ -18,3 +18,19 @@ export const authGuard: CanActivateFn = () => {
   sessionStorage.removeItem('emsStoreToken');
   return router.parseUrl('/login');
 };
+
+export const homeGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  try {
+    const user = JSON.parse(sessionStorage.getItem('emsStoreUser') ?? '{}') as { rol?: string };
+    return router.parseUrl(user.rol === 'Administrador' ? '/dashboard' : '/inventario');
+  } catch {
+    return router.parseUrl('/login');
+  }
+};
+
+export const logoutOnLoginGuard: CanActivateFn = () => {
+  sessionStorage.removeItem('emsStoreUser');
+  sessionStorage.removeItem('emsStoreToken');
+  return true;
+};

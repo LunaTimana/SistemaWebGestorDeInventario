@@ -150,6 +150,19 @@ select {
   padding: 22px;
 }
 
+.selector-modo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 20px;
+
+  .activo {
+    border-color: var(--ems-lime);
+    background: var(--ems-lime);
+    color: #111;
+  }
+}
+
 .encabezado-formulario {
   display: flex;
   justify-content: space-between;

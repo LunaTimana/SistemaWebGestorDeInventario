@@ -5,6 +5,7 @@
 Requisitos: MySQL 8.0.16 o superior, Java 21 y Node.js/npm. Mantén MySQL en ejecución mientras uses el sistema.
 
 1. En MySQL Workbench, abre y ejecuta `DB_EMS_Prueba1.sql`. El script crea la base `ems_store`, sus tablas y datos de ejemplo. Si ya tienes el esquema creado, no vuelvas a ejecutar el script completo.
+   Si ya tienes una base creada, ejecuta una sola vez `backend/src/main/resources/db/migration/V20261120_01__agregar_genero_variante.sql` en MySQL Workbench antes de iniciar el backend. Agrega género a las variantes y actualiza la regla de unicidad.
 2. Abre una primera ventana de PowerShell en la carpeta del proyecto y ejecuta:
 
    ```powershell

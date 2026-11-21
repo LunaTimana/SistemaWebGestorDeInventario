@@ -17,12 +17,18 @@ export class RegistrarSalida implements OnInit {
   destinoOrigen = '';
   documento = '';
   comentario = '';
+  esVentas = false;
   cargando = true;
   guardando = false;
   error = '';
   ngOnInit(): void {
+    try {
+      this.esVentas = (JSON.parse(sessionStorage.getItem('emsStoreUser') ?? '{}') as { rol?: string }).rol === 'Ventas';
+    } catch {
+      this.esVentas = false;
+    }
     forkJoin({ productos: this.service.obtenerProductos(), variantes: this.service.obtenerVariantes() }).subscribe({
-      next: ({ productos, variantes }) => { this.variantes = variantes.map(v => ({ ...v, etiqueta: `${v.codigoUnico} · ${productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`} · ${v.talla}/${v.color} (stock: ${v.stockActual})` })); this.cargando = false; this.cdr.markForCheck(); },
+      next: ({ productos, variantes }) => { this.variantes = variantes.map(v => ({ ...v, etiqueta: `${v.codigoUnico} · ${productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`} · ${v.genero ?? 'Hombre'} ${v.talla}/${v.color} (stock: ${v.stockActual})` })); this.cargando = false; this.cdr.markForCheck(); },
       error: () => { this.error = 'No se pudieron cargar las variantes.'; this.cargando = false; this.cdr.markForCheck(); }
     });
   }

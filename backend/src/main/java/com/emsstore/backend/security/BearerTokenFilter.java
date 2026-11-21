@@ -28,13 +28,19 @@ public class BearerTokenFilter extends OncePerRequestFilter {
             TokenService.Claims claims = tokenService.validar(header.substring(7).trim());
             if (claims != null) {
                 List<Map<String,Object>> usuarios = jdbc.queryForList(
-                        "SELECT r.nombre AS rol FROM usuarios u JOIN roles r ON r.id=u.rol_id WHERE u.id=? AND u.estado='activo'",
+                        "SELECT r.nombre AS rol, u.debe_cambiar_contrasena AS debeCambiarContrasena FROM usuarios u JOIN roles r ON r.id=u.rol_id WHERE u.id=? AND u.estado='activo'",
                         claims.userId());
                 if (!usuarios.isEmpty()) {
                     String rolActual = String.valueOf(usuarios.get(0).get("rol"));
-                    var auth = new UsernamePasswordAuthenticationToken(
-                            claims.userId(), null, List.of(new SimpleGrantedAuthority("ROLE_" + rolActual)));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    boolean debeCambiar = Boolean.TRUE.equals(usuarios.get(0).get("debeCambiarContrasena"));
+                    String path = request.getRequestURI();
+                    boolean puedeCambiarClave = ("GET".equals(request.getMethod()) && "/api/auth/me".equals(path))
+                            || ("PUT".equals(request.getMethod()) && "/api/auth/me/contrasena".equals(path));
+                    if (!debeCambiar || puedeCambiarClave) {
+                        var auth = new UsernamePasswordAuthenticationToken(
+                                claims.userId(), null, List.of(new SimpleGrantedAuthority("ROLE_" + rolActual)));
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    }
                 }
             }
         }

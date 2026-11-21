@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -34,7 +34,8 @@ export class Login {
         next: (respuesta) => {
           sessionStorage.setItem('emsStoreUser', JSON.stringify(respuesta.usuario));
           sessionStorage.setItem('emsStoreToken', respuesta.token);
-          void this.router.navigateByUrl('/dashboard');
+          const destino = respuesta.usuario.rol === 'Administrador' ? '/dashboard' : '/inventario';
+          void this.router.navigateByUrl(respuesta.usuario.debeCambiarContrasena ? '/configuracion' : destino);
         },
         error: (error) => {
           if (error.status === 401) {

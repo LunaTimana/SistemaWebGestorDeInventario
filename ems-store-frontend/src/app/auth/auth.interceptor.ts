@@ -12,7 +12,9 @@ import { finalize, timeout } from 'rxjs';
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const appRef = inject(ApplicationRef);
   const token = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('emsStoreToken') : null;
-  const authenticatedRequest = token && !request.url.includes('/api/auth/login')
+  const isBackendRequest = request.url.startsWith('http://localhost:8080/api/');
+  const isLoginRequest = request.url === 'http://localhost:8080/api/auth/login';
+  const authenticatedRequest = token && isBackendRequest && !isLoginRequest
     ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : request;
 

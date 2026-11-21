@@ -15,8 +15,14 @@ public class TokenService {
     private final long durationSeconds;
 
     public TokenService(
-            @Value("${ems.jwt.secret:${JWT_SECRET:EMS-Store-dev-secret-change-before-production-2026}}") String secret,
+            @Value("${ems.jwt.secret:${JWT_SECRET}}") String secret,
             @Value("${ems.jwt.duration-seconds:28800}") long durationSeconds) {
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalStateException("Configura JWT_SECRET con al menos 32 caracteres aleatorios.");
+        }
+        if (durationSeconds < 1 || durationSeconds > 86400) {
+            throw new IllegalStateException("ems.jwt.duration-seconds debe estar entre 1 y 86400.");
+        }
         this.secret = secret.getBytes(StandardCharsets.UTF_8);
         this.durationSeconds = durationSeconds;
     }

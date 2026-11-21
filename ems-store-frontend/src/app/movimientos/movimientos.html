@@ -1,5 +1,7 @@
 <section class="tarjeta acciones-superiores">
-  <a class="boton-verde" routerLink="/movimientos/entrada"><i class="bi bi-plus-circle"></i> Nueva entrada</a>
+  @if (!esVentas) {
+    <a class="boton-verde" routerLink="/movimientos/entrada"><i class="bi bi-plus-circle"></i> Nueva entrada</a>
+  }
   <a class="boton-rojo" routerLink="/movimientos/salida"><i class="bi bi-plus-circle"></i> Nueva salida</a>
 </section>
 

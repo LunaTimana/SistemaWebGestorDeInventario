@@ -27,6 +27,9 @@ export class RegistrarProducto implements OnInit {
   cargando = true;
   guardando = false;
   editando = false;
+  modo: 'nuevo' | 'variante' = 'nuevo';
+  productos: Producto[] = [];
+  productoExistenteId: number | null = null;
   error = '';
   mensaje = '';
 
@@ -48,6 +51,7 @@ export class RegistrarProducto implements OnInit {
 
   varianteForm = {
     talla: 'M',
+    genero: 'Hombre',
     color: '',
     codigoUnico: '',
     stockActual: 0,
@@ -77,6 +81,7 @@ export class RegistrarProducto implements OnInit {
         this.categorias = categorias;
         this.marcas = marcas;
         this.proveedores = proveedores;
+        this.productos = productos;
 
         if (sku) {
           const variante = variantes.find(v => v.codigoUnico === sku);
@@ -102,6 +107,7 @@ export class RegistrarProducto implements OnInit {
               };
               this.varianteForm = {
                 talla: variante.talla,
+                genero: variante.genero ?? 'Hombre',
                 color: variante.color,
                 codigoUnico: variante.codigoUnico,
                 stockActual: Number(variante.stockActual ?? 0),
@@ -130,9 +136,32 @@ export class RegistrarProducto implements OnInit {
     const marca = this.marcas.find(m => m.id === Number(this.productoForm.marcaId))?.nombre ?? 'EMS';
     const marcaCodigo = marca.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 3) || 'EMS';
     const nombreCodigo = this.productoForm.nombreModelo.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 5) || 'ITEM';
+    const genero = (this.varianteForm.genero || 'Hombre').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().slice(0, 1);
     const talla = (this.varianteForm.talla || 'UN').toUpperCase().replace(/\s/g, '');
     const color = this.varianteForm.color.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 3) || 'COL';
-    this.varianteForm.codigoUnico = `${marcaCodigo}-${nombreCodigo}-${talla}-${color}-${this.sufijoSku}`;
+    this.varianteForm.codigoUnico = `${marcaCodigo}-${nombreCodigo}-${genero}-${talla}-${color}-${this.sufijoSku}`;
+  }
+
+  seleccionarProductoExistente(id: number | null): void {
+    this.productoExistenteId = id;
+    const producto = this.productos.find(p => p.id === Number(id));
+    if (!producto) return;
+    this.productoForm = {
+      nombreModelo: producto.nombreModelo,
+      marcaId: producto.marcaId,
+      categoriaId: producto.categoriaId,
+      proveedorId: producto.proveedorId ?? null,
+      diseno: producto.diseno ?? '',
+      descripcion: producto.descripcion ?? '',
+      imagenUrl: producto.imagenUrl ?? '',
+      costoUnitario: Number(producto.costoUnitario ?? 0),
+      precioVenta: Number(producto.precioVenta ?? 0)
+    };
+    this.generarSku();
+  }
+
+  marcaNombre(marcaId: number): string {
+    return this.marcas.find(m => m.id === Number(marcaId))?.nombre ?? '';
   }
 
   get gananciaUnidad(): number {
@@ -152,8 +181,9 @@ export class RegistrarProducto implements OnInit {
     this.error = '';
     this.mensaje = '';
 
-    if (!this.productoForm.nombreModelo.trim() || !this.productoForm.marcaId || !this.productoForm.categoriaId ||
-        !this.varianteForm.talla || !this.varianteForm.color.trim() ||
+    const productoInvalido = (this.editando || this.modo === 'nuevo') && (!this.productoForm.nombreModelo.trim() || !this.productoForm.marcaId || !this.productoForm.categoriaId);
+    if (productoInvalido ||
+        !this.varianteForm.talla || !this.varianteForm.genero || !this.varianteForm.color.trim() ||
         Number(this.productoForm.costoUnitario) < 0 || Number(this.productoForm.precioVenta) < 0 ||
         Number(this.varianteForm.stockActual) < 0 || Number(this.varianteForm.stockMinimo) < 0) {
       this.error = 'Completa los campos obligatorios y utiliza valores numéricos iguales o mayores que cero.';
@@ -174,6 +204,7 @@ export class RegistrarProducto implements OnInit {
     };
     const variante = {
       talla: this.varianteForm.talla.trim(),
+      genero: this.varianteForm.genero,
       color: this.varianteForm.color.trim(),
       codigoUnico: this.varianteForm.codigoUnico,
       stockActual: Number(this.varianteForm.stockActual),
@@ -182,6 +213,47 @@ export class RegistrarProducto implements OnInit {
 
     this.guardando = true;
     this.cdr.detectChanges();
+
+    if (!this.editando && this.modo === 'variante') {
+      if (!this.productoExistenteId) {
+        this.error = 'Selecciona el producto al que quieres agregar esta variante.';
+        this.guardando = false;
+        return;
+      }
+      const existente = this.productos.find(p => p.id === this.productoExistenteId)!;
+      this.productoService.crearVariante({
+        productoId: existente.id,
+        talla: variante.talla,
+        genero: variante.genero,
+        color: variante.color,
+        codigoUnico: variante.codigoUnico,
+        stockActual: 0,
+        stockMinimo: variante.stockMinimo
+      }).subscribe({
+        next: creada => {
+          const registrarStock = variante.stockActual > 0
+            ? this.productoService.registrarMovimiento({ varianteId: creada.id, tipo: 'entrada', motivo: 'ajuste', cantidad: variante.stockActual, documento: 'Stock inicial', comentario: 'Stock inicial al agregar variante' })
+            : null;
+          if (!registrarStock) { this.router.navigate(['/inventario']); return; }
+          registrarStock.subscribe({
+            next: () => this.router.navigate(['/inventario']),
+            error: err => {
+              const detalle = err?.error?.detail || err?.error?.message;
+              this.error = detalle ? `La variante se creó, pero no se pudo registrar el stock: ${detalle}` : 'La variante se creó, pero no se pudo registrar el stock inicial.';
+              this.guardando = false;
+              this.cdr.detectChanges();
+            }
+          });
+        },
+        error: err => {
+          const detalle = err?.error?.detail || err?.error?.message;
+          this.error = detalle ? `No se pudo agregar la variante: ${detalle}` : 'No se pudo agregar la variante. Verifica que el SKU y la combinación de talla, género y color no estén repetidos.';
+          this.guardando = false;
+          this.cdr.detectChanges();
+        }
+      });
+      return;
+    }
 
     const solicitud = this.editando && this.productoId !== null && this.varianteId !== null
       ? this.productoService.actualizarProductoCompleto(this.productoId, this.varianteId, { producto, variante })

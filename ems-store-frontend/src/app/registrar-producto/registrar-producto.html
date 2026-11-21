@@ -3,25 +3,47 @@
     <form class="tarjeta formulario-producto" #formProducto="ngForm" (ngSubmit)="guardarProducto()">
       <div class="encabezado-formulario">
         <div>
-          <h2 class="titulo-formulario">{{ editando ? 'Editar producto' : 'Registrar producto' }}</h2>
+          <h2 class="titulo-formulario">{{ editando ? 'Editar producto' : modo === 'variante' ? 'Agregar variante' :
+            'Registrar producto' }}</h2>
           <p>Los datos se guardan directamente en la base de datos de EMS Store.</p>
         </div>
         <span class="etiqueta-modo">{{ editando ? 'Edición' : 'Nuevo registro' }}</span>
       </div>
 
       @if (cargando) {
-        <div class="alert alert-info">Cargando catálogos...</div>
+      <div class="alert alert-info">Cargando catálogos...</div>
       }
       @if (error) {
-        <div class="alert alert-danger" role="alert">{{ error }}</div>
+      <div class="alert alert-danger" role="alert">{{ error }}</div>
+      }
+
+      @if (!editando) {
+      <div class="selector-modo" role="group" aria-label="Tipo de registro">
+        <button type="button" class="boton-claro" [class.activo]="modo === 'nuevo'" (click)="modo = 'nuevo'">Nuevo
+          producto</button>
+        <button type="button" class="boton-claro" [class.activo]="modo === 'variante'"
+          (click)="modo = 'variante'">Variante de producto existente</button>
+      </div>
       }
 
       <fieldset [disabled]="cargando || guardando">
+        @if (!editando && modo === 'variante') {
+        <div class="mb-3">
+          <label for="productoExistente">Producto *</label>
+          <select id="productoExistente" name="productoExistente" [ngModel]="productoExistenteId"
+            (ngModelChange)="seleccionarProductoExistente($event)" required>
+            <option [ngValue]="null" disabled>Selecciona un producto existente</option>
+            @for (producto of productos; track producto.id) {
+            <option [ngValue]="producto.id">{{ producto.nombreModelo }} - {{ marcaNombre(producto.marcaId) }}</option>
+            }
+          </select>
+        </div>
+        }
         <h3 class="subtitulo-formulario">Información del producto</h3>
         <div class="row g-3">
           <div class="col-12 col-md-8">
-            <label for="nombreModelo">Nombre del producto *</label>
-            <input id="nombreModelo" name="nombreModelo" type="text" maxlength="100"
+            <label for="nombreModelo">Equipo y modelo *</label>
+            <input id="nombreModelo" name="nombreModelo" type="text" maxlength="100" placeholder="Alianza Lima - Bicentenario"
               [(ngModel)]="productoForm.nombreModelo" (ngModelChange)="generarSku()" required />
           </div>
           <div class="col-12 col-md-4">
@@ -34,16 +56,17 @@
             <select id="categoria" name="categoriaId" [(ngModel)]="productoForm.categoriaId" required>
               <option [ngValue]="0" disabled>Selecciona una categoría</option>
               @for (categoria of categorias; track categoria.id) {
-                <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+              <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
               }
             </select>
           </div>
           <div class="col-12 col-md-4">
             <label for="marca">Marca *</label>
-            <select id="marca" name="marcaId" [(ngModel)]="productoForm.marcaId" (ngModelChange)="generarSku()" required>
+            <select id="marca" name="marcaId" [(ngModel)]="productoForm.marcaId" (ngModelChange)="generarSku()"
+              required>
               <option [ngValue]="0" disabled>Selecciona una marca</option>
               @for (marca of marcas; track marca.id) {
-                <option [ngValue]="marca.id">{{ marca.nombre }}</option>
+              <option [ngValue]="marca.id">{{ marca.nombre }}</option>
               }
             </select>
           </div>
@@ -52,13 +75,13 @@
             <select id="proveedor" name="proveedorId" [(ngModel)]="productoForm.proveedorId">
               <option [ngValue]="null">Sin proveedor</option>
               @for (proveedor of proveedores; track proveedor.id) {
-                <option [ngValue]="proveedor.id">{{ proveedor.nombre }}</option>
+              <option [ngValue]="proveedor.id">{{ proveedor.nombre }}</option>
               }
             </select>
           </div>
 
           <div class="col-12 col-md-6">
-            <label for="diseno">Diseño / modelo (opcional)</label>
+            <label for="diseno">Detalle del diseño (opcional)</label>
             <input id="diseno" name="diseno" type="text" maxlength="100" [(ngModel)]="productoForm.diseno" />
           </div>
           <div class="col-12 col-md-6">
@@ -76,13 +99,30 @@
           <div class="col-6 col-md-3">
             <label for="talla">Talla *</label>
             <select id="talla" name="talla" [(ngModel)]="varianteForm.talla" (ngModelChange)="generarSku()" required>
+              <option value="XS">XS</option>
               <option value="S">S</option>
               <option value="M">M</option>
               <option value="L">L</option>
               <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+              <option value="4">Niños 4</option>
+              <option value="6">Niños 6</option>
+              <option value="8">Niños 8</option>
+              <option value="10">Niños 10</option>
+              <option value="12">Niños 12</option>
+              <option value="14">Niños 14</option>
+              <option value="16">Niños 16</option>
               <option value="42">42</option>
               <option value="43">43</option>
               <option value="Única">Única</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label for="genero">Género *</label>
+            <select id="genero" name="genero" [(ngModel)]="varianteForm.genero" (ngModelChange)="generarSku()" required>
+              <option value="Hombre">Hombre</option>
+              <option value="Mujer">Mujer</option>
+              <option value="Niños">Niños</option>
             </select>
           </div>
           <div class="col-6 col-md-3">
@@ -119,7 +159,8 @@
 
       <div class="acciones-formulario">
         <button type="submit" class="boton-lima" [disabled]="cargando || guardando">
-          @if (guardando) { Guardando... } @else { {{ editando ? 'Guardar cambios' : 'Guardar producto' }} }
+          @if (guardando) { Guardando... } @else { {{ editando ? 'Guardar cambios' : modo === 'variante' ? 'Agregar
+          variante' : 'Guardar producto' }} }
         </button>
         <a class="boton-claro" routerLink="/inventario">Cancelar</a>
       </div>
@@ -144,7 +185,7 @@
     </section>
     <section class="tarjeta nota-producto">
       <h3 class="titulo-formulario">Importante</h3>
-      <p>Este formulario registra un modelo y una variante (talla y color). Para agregar otras tallas o colores del mismo modelo, registra otra variante desde el formulario.</p>
+      <p>Registra el equipo y modelo como producto base, por ejemplo “Alianza Lima - Bicentenario”. Agrega cada combinación de talla, género y color como una variante.</p>
       <p>El SKU se genera automáticamente y se guarda junto con el stock en la base de datos.</p>
     </section>
   </div>

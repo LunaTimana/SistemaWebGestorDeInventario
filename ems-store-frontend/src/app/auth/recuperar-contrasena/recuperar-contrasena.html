@@ -1,0 +1,33 @@
+<main class="login">
+  <img class="login__logo" src="logoEMS.png" alt="EMS Store" />
+  <section class="login__tarjeta">
+    @if (token) {
+    <h1>Crear contraseña nueva</h1>
+    <form (ngSubmit)="guardar()" #form="ngForm">
+      <label for="nueva">Nueva contraseña</label>
+      <input id="nueva" name="nueva" type="password" [(ngModel)]="nueva" autocomplete="new-password" required
+        maxlength="72" />
+      <label for="confirmar">Confirmar contraseña</label>
+      <input id="confirmar" name="confirmar" type="password" [(ngModel)]="confirmar" autocomplete="new-password"
+        required maxlength="72" />
+      <p class="ayuda-clave">Usa 8 o más caracteres, con mayúscula, minúscula, número y símbolo.</p>
+      @if (error) { <p class="login__error" role="alert">{{ error }}</p> }
+      @if (mensaje) { <p class="login__mensaje" role="status">{{ mensaje }}</p> }
+      <button class="login__boton" type="submit" [disabled]="form.invalid || cargando || !!mensaje">{{ cargando ?
+        'Guardando...' : 'Guardar contraseña' }}</button>
+    </form>
+    } @else {
+    <h1>Recuperar contraseña</h1>
+    <p class="ayuda-clave">Ingresa el correo asociado a tu cuenta y te enviaremos un enlace para cambiarla.</p>
+    <form (ngSubmit)="solicitar()" #form="ngForm">
+      <label for="correo">Correo electrónico</label>
+      <input id="correo" name="correo" type="email" [(ngModel)]="correo" autocomplete="email" required />
+      @if (error) { <p class="login__error" role="alert">{{ error }}</p> }
+      @if (mensaje) { <p class="login__mensaje" role="status">{{ mensaje }}</p> }
+      <button class="login__boton" type="submit" [disabled]="form.invalid || cargando">{{ cargando ? 'Enviando...' :
+        'Enviar enlace' }}</button>
+    </form>
+    }
+    <a class="login__olvido" routerLink="/login">Volver a iniciar sesión</a>
+  </section>
+</main>

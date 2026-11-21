@@ -10,13 +10,17 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.security.SecureRandom;
 
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final String TEMP_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
     private final JdbcTemplate jdbc;
     private final PasswordEncoder encoder;
     public UsuarioController(JdbcTemplate jdbc, PasswordEncoder encoder) { this.jdbc = jdbc; this.encoder = encoder; }
@@ -43,7 +47,9 @@ public class UsuarioController {
         Integer roleId = roleId(req.rol());
         if (jdbc.queryForObject("SELECT COUNT(*) FROM usuarios WHERE LOWER(correo)=LOWER(?)", Integer.class, req.correo().trim()) > 0)
             throw new ResponseStatusException(HttpStatus.CONFLICT,"Ya existe un usuario con ese correo.");
-        String temp = req.contrasena() == null || req.contrasena().isBlank() ? "EMSStoreTemp2026" : req.contrasena();
+        String temp = req.contrasena() == null || req.contrasena().isBlank() ? generarContrasenaTemporal() : req.contrasena();
+        if (!temp.matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,72}$"))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"La clave debe incluir 8-72 caracteres, mayuscula, minuscula, numero y simbolo.");
         jdbc.update("INSERT INTO usuarios(nombre,apellido,correo,contrasena_hash,debe_cambiar_contrasena,rol_id,estado) VALUES(?,?,?,?,TRUE,?,'activo')",
                 req.nombre().trim(),req.apellido().trim(),req.correo().trim().toLowerCase(),encoder.encode(temp),roleId);
         return Map.of("mensaje","Usuario creado. Debe cambiar su contraseña temporal.","contrasenaTemporal",temp);
@@ -71,7 +77,12 @@ public class UsuarioController {
         if(ids.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Rol inválido.");
         return ids.get(0);
     }
-    public record NuevoUsuario(@NotBlank String nombre,@NotBlank String apellido,@NotBlank @Email String correo,String contrasena,@NotBlank String rol) {}
+    private String generarContrasenaTemporal() {
+        StringBuilder value = new StringBuilder("Aa1!");
+        for (int i = 0; i < 16; i++) value.append(TEMP_CHARS.charAt(RANDOM.nextInt(TEMP_CHARS.length())));
+        return value.toString();
+    }
+    public record NuevoUsuario(@NotBlank String nombre,@NotBlank String apellido,@NotBlank @Email String correo,@Size(max = 72) String contrasena,@NotBlank String rol) {}
     public record CambioRol(@NotBlank String rol) {}
     public record CambioEstado(@NotNull String estado) {}
 }

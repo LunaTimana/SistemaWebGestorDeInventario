@@ -26,6 +26,14 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { correo, contrasena });
   }
 
+  solicitarRecuperacion(correo: string): Observable<{ mensaje: string }> {
+    return this.http.post<{ mensaje: string }>(`${this.apiUrl}/forgot-password`, { correo });
+  }
+
+  restablecerContrasena(token: string, nueva: string): Observable<{ mensaje: string }> {
+    return this.http.post<{ mensaje: string }>(`${this.apiUrl}/reset-password`, { token, nueva });
+  }
+
   cerrarSesion(): void {
     sessionStorage.removeItem('emsStoreUser');
     sessionStorage.removeItem('emsStoreToken');

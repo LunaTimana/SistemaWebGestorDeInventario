@@ -34,7 +34,7 @@ public class VarianteProductoController {
         VarianteProducto v = obtener(id);
         if (datos.getStockActual() != null && !datos.getStockActual().equals(v.getStockActual()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"No modifiques el stock directamente; registra una entrada, salida o ajuste.");
-        v.setProductoId(datos.getProductoId()); v.setTalla(datos.getTalla()); v.setColor(datos.getColor());
+        v.setProductoId(datos.getProductoId()); v.setTalla(datos.getTalla()); v.setGenero(datos.getGenero()); v.setColor(datos.getColor());
         v.setCodigoUnico(datos.getCodigoUnico()); v.setStockMinimo(datos.getStockMinimo());
         return repo.save(v);
     }

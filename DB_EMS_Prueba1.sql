@@ -87,18 +87,19 @@ CREATE TABLE productos (
     CONSTRAINT chk_producto_precio   CHECK (precio_venta >= 0)
 );
 
--- Variante específica del producto: combinación modelo-talla-color (RF01)
+-- Variante específica del producto: combinación modelo-talla-género-color (RF01)
 CREATE TABLE variantes_producto (
     id              INT PRIMARY KEY AUTO_INCREMENT,
     producto_id     INT         NOT NULL,
     talla           VARCHAR(20) NOT NULL,
+    genero          VARCHAR(20) NOT NULL DEFAULT 'Hombre',
     color           VARCHAR(40) NOT NULL,
     codigo_unico    VARCHAR(50) NOT NULL UNIQUE,   -- SKU generado por la aplicación
     stock_actual    INT         NOT NULL DEFAULT 0,
     stock_minimo    INT         NOT NULL DEFAULT 0, -- usado en la pantalla de Alertas
     CONSTRAINT fk_variante_producto FOREIGN KEY (producto_id) REFERENCES productos(id),
-    -- RF01: la combinación modelo-talla-color no puede repetirse
-    CONSTRAINT uq_variante UNIQUE (producto_id, talla, color),
+    -- RF01: la combinación modelo-talla-género-color no puede repetirse
+    CONSTRAINT uq_variante UNIQUE (producto_id, talla, color, genero),
     -- RF03: segunda barrera para que el stock nunca quede negativo
     CONSTRAINT chk_stock_actual CHECK (stock_actual >= 0),
     CONSTRAINT chk_stock_minimo CHECK (stock_minimo >= 0)
@@ -158,6 +159,7 @@ SELECT
     p.nombre_modelo AS producto,
     c.nombre        AS categoria,
     v.talla,
+    v.genero,
     v.color,
     v.stock_actual  AS stock,
     v.stock_minimo,
@@ -181,6 +183,8 @@ SELECT
     v.id            AS variante_id,
     v.codigo_unico  AS sku,
     p.nombre_modelo AS producto,
+    v.talla,
+    v.genero,
     v.stock_actual,
     v.stock_minimo,
     v.stock_actual - v.stock_minimo AS deficit,
@@ -302,7 +306,7 @@ WHERE v.id > 0;
 --   el CHECK de la tabla es solo la segunda barrera.
 --
 -- SKU: los códigos de ejemplo (NK-PEG40-10) no incluyen el color. La
---   restricción uq_variante evita duplicar modelo-talla-color, pero si dos
+--   restricción uq_variante evita duplicar modelo-talla-género-color, pero si dos
 --   colores de la misma talla generan el mismo código, chocarán con el UNIQUE
 --   de codigo_unico. Define la regla de generación (incluir el color o usar
 --   una secuencia).

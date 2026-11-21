@@ -8,5 +8,5 @@ export const roleGuard: CanActivateFn = (route) => {
     const allowed = route.data['roles'] as string[] | undefined;
     if (user.rol && (!allowed || allowed.includes(user.rol))) return true;
   } catch { /* sesión inválida */ }
-  return router.parseUrl('/dashboard');
+  return router.parseUrl('/inventario');
 };

@@ -17,10 +17,10 @@
     </nav>
 
     <div class="sidebar__pie">
-      <span class="avatar">MM</span>
+      <span class="avatar">{{ usuario.iniciales }}</span>
       <span class="sidebar__usuario">
-        <strong>ADMINISTRADOR</strong>
-        <small>Admin de Tienda</small>
+        <strong>{{ usuario.nombre }}</strong>
+        <small>{{ usuario.rol }}</small>
       </span>
     </div>
   </aside>
@@ -39,10 +39,10 @@
           <div class="topbar__ruta">
             EMS Store
             @if (actual(); as a) {
-              / {{ a.titulo }}
+            / {{ a.titulo }}
             }
             @if (subpantalla(); as s) {
-              / {{ s.titulo }}
+            / {{ s.titulo }}
             }
           </div>
           <h1>{{ encabezado() }}</h1>

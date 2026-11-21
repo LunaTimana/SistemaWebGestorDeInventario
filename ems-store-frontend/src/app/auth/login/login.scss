@@ -81,6 +81,10 @@
   margin-top: 16px;
   font-size: 0.72rem;
   color: var(--ems-texto-suave);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover { color: var(--ems-lime); }
 }
 
 .campo-clave {

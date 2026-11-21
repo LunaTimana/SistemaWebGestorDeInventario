@@ -18,6 +18,7 @@ interface FilaInventario {
   nombre: string;
   categoria: string;
   talla: string;
+  genero: string;
   color: string;
   stock: number;
   precio: number;
@@ -40,6 +41,7 @@ export class Inventario implements OnInit {
   busqueda = '';
   categoriaSeleccionada = '';
   tallaSeleccionada = '';
+  generoSeleccionado = '';
   eliminandoId: number | null = null;
   exportandoExcel = false;
   importandoExcel = false;
@@ -89,6 +91,7 @@ export class Inventario implements OnInit {
               nombre: producto.nombreModelo,
               categoria: this.categoriasPorId[producto.categoriaId] ?? `Categoría #${producto.categoriaId}`,
               talla: variante.talla,
+              genero: variante.genero ?? 'Hombre',
               color: variante.color,
               stock: Number(variante.stockActual ?? 0),
               precio: Number(producto.precioVenta ?? 0),
@@ -123,7 +126,8 @@ export class Inventario implements OnInit {
         p.marca.toLocaleLowerCase().includes(texto);
       const coincideCategoria = !this.categoriaSeleccionada || p.categoria === this.categoriaSeleccionada;
       const coincideTalla = !this.tallaSeleccionada || p.talla.toLocaleLowerCase() === this.tallaSeleccionada.toLocaleLowerCase();
-      return coincideBusqueda && coincideCategoria && coincideTalla;
+      const coincideGenero = !this.generoSeleccionado || p.genero === this.generoSeleccionado;
+      return coincideBusqueda && coincideCategoria && coincideTalla && coincideGenero;
     });
   }
 

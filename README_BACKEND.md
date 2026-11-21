@@ -28,6 +28,20 @@ Si tu usuario root no tiene contraseña, deja `DB_PASSWORD` vacia:
 
 Requiere Java 21 y acceso a internet la primera vez para descargar dependencias Maven.
 
+### Recuperar contraseña con Gmail
+
+El flujo de recuperación envía un enlace de un solo uso que vence en 30 minutos. En la cuenta Gmail que enviará los mensajes, activa la verificación en dos pasos y crea una contraseña de aplicación. No uses la contraseña normal de Gmail ni guardes la contraseña de aplicación en el repositorio.
+
+En PowerShell, antes de iniciar el backend, configura:
+
+```powershell
+$env:MAIL_USERNAME="tu-cuenta@gmail.com"
+$env:MAIL_PASSWORD="CONTRASENA_DE_APLICACION_SIN_ESPACIOS"
+$env:APP_FRONTEND_URL="http://localhost:4200"
+```
+
+La contraseña de aplicación se crea desde la seguridad de la cuenta Google; Google puede ocultar esa opción si la cuenta no tiene verificación en dos pasos o está administrada por una organización. Pégala sin espacios; el backend también elimina espacios al leerla. La tabla `password_reset_tokens` se crea al iniciar el backend mediante `schema.sql`.
+
 ## Endpoints implementados
 
 - `GET /api/productos` y `GET /api/productos?q=laptop`

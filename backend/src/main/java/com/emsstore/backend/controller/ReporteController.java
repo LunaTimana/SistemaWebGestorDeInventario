@@ -9,6 +9,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -62,5 +69,58 @@ public class ReporteController {
             wb.write(out);
             return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=EMS-Store-Movimientos.xlsx").contentType(MediaType.parseMediaType(MIME)).body(out.toByteArray());
         } catch(IOException e){ throw new IllegalStateException("No se pudo generar el reporte de movimientos",e); }
+    }
+
+    @GetMapping(value="/inventario/pdf", produces="application/pdf")
+    public ResponseEntity<byte[]> exportarInventarioPdf() {
+        List<Map<String,Object>> rows = jdbc.queryForList("""
+            SELECT v.codigo_unico AS sku,p.nombre_modelo AS producto,ma.nombre AS marca,c.nombre AS categoria,
+                   v.talla,v.color,v.stock_actual AS stock,v.stock_minimo AS minimo,p.precio_venta AS precio
+            FROM variantes_producto v JOIN productos p ON p.id=v.producto_id
+            LEFT JOIN marcas ma ON ma.id=p.marca_id LEFT JOIN categorias c ON c.id=p.categoria_id
+            ORDER BY p.nombre_modelo,v.talla,v.color
+            """);
+        return pdf("Reporte de Inventario General", new String[]{"SKU","Producto","Marca","Categoría","Talla","Color","Stock","Mínimo","Precio"}, rows,
+            new String[]{"sku","producto","marca","categoria","talla","color","stock","minimo","precio"}, "EMS-Store-Inventario.pdf", true);
+    }
+
+    @GetMapping(value="/movimientos/pdf", produces="application/pdf")
+    public ResponseEntity<byte[]> exportarMovimientosPdf() {
+        List<Map<String,Object>> rows = jdbc.queryForList("""
+            SELECT m.fecha,m.tipo,m.motivo,v.codigo_unico AS sku,p.nombre_modelo AS producto,
+                   m.cantidad,CONCAT(u.nombre,' ',u.apellido) AS responsable,m.documento
+            FROM movimientos_inventario m JOIN variantes_producto v ON v.id=m.variante_id
+            JOIN productos p ON p.id=v.producto_id JOIN usuarios u ON u.id=m.usuario_id
+            ORDER BY m.fecha DESC,m.id DESC
+            """);
+        return pdf("Reporte de Movimientos", new String[]{"Fecha","Tipo","Motivo","SKU","Producto","Cantidad","Responsable","Documento"}, rows,
+            new String[]{"fecha","tipo","motivo","sku","producto","cantidad","responsable","documento"}, "EMS-Store-Movimientos.pdf", true);
+    }
+
+    private ResponseEntity<byte[]> pdf(String title, String[] headers, List<Map<String,Object>> rows,
+                                       String[] keys, String filename, boolean landscape) {
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            Document document = new Document(landscape ? PageSize.A4.rotate() : PageSize.A4, 24, 24, 28, 28);
+            PdfWriter.getInstance(document, out);
+            document.open();
+            document.add(new Paragraph(title));
+            document.add(new Paragraph("Generado: " + java.time.LocalDate.now()));
+            document.add(new Paragraph(" "));
+            PdfPTable table = new PdfPTable(headers.length);
+            table.setWidthPercentage(100);
+            for (String header : headers) table.addCell(new Phrase(header));
+            for (Map<String,Object> row : rows) {
+                for (String key : keys) {
+                    Object value = row.get(key);
+                    table.addCell(value == null ? "" : value.toString());
+                }
+            }
+            document.add(table);
+            document.close();
+            return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                    .contentType(MediaType.APPLICATION_PDF).contentLength(out.size()).body(out.toByteArray());
+        } catch (DocumentException | IOException e) {
+            throw new IllegalStateException("No se pudo generar " + filename, e);
+        }
     }
 }

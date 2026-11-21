@@ -27,7 +27,7 @@ public class MovimientoInventarioController {
     @GetMapping
     public List<Map<String, Object>> listar(@RequestParam(required = false) String tipo) {
         String sql = "SELECT m.id, m.fecha, m.tipo, m.motivo, m.cantidad, m.documento, m.destino_origen, m.comentario, " +
-                "v.codigo_unico AS sku, v.talla, v.color, p.nombre_modelo AS producto, u.nombre AS responsable_nombre, " +
+                "v.codigo_unico AS sku, v.talla, v.genero, v.color, p.nombre_modelo AS producto, u.nombre AS responsable_nombre, " +
                 "u.apellido AS responsable_apellido, pr.nombre AS proveedor " +
                 "FROM movimientos_inventario m JOIN variantes_producto v ON v.id=m.variante_id " +
                 "JOIN productos p ON p.id=v.producto_id JOIN usuarios u ON u.id=m.usuario_id " +
@@ -44,6 +44,10 @@ public class MovimientoInventarioController {
     public Map<String, Object> registrar(@Valid @RequestBody MovimientoRequest request, Authentication auth) {
         String tipo = request.tipo().trim().toLowerCase();
         String motivo = request.motivo().trim().toLowerCase();
+        boolean esVentas = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_Ventas"));
+        if (esVentas && !(tipo.equals("salida") && motivo.equals("venta"))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El rol Ventas solo puede registrar salidas por venta.");
+        }
         validarTipoMotivo(tipo, motivo);
         Integer userId = (Integer) auth.getPrincipal();
         List<StockRow> rows = jdbc.query("SELECT stock_actual, stock_minimo FROM variantes_producto WHERE id=? FOR UPDATE",
@@ -76,7 +80,7 @@ public class MovimientoInventarioController {
                 Map.entry("tipo", rs.getString("tipo")), Map.entry("motivo", rs.getString("motivo")),
                 Map.entry("cantidad", rs.getInt("cantidad")), Map.entry("documento", value(rs.getString("documento"))),
                 Map.entry("destinoOrigen", value(rs.getString("destino_origen"))), Map.entry("comentario", value(rs.getString("comentario"))),
-                Map.entry("sku", rs.getString("sku")), Map.entry("talla", rs.getString("talla")), Map.entry("color", rs.getString("color")),
+                Map.entry("sku", rs.getString("sku")), Map.entry("talla", rs.getString("talla")), Map.entry("genero", rs.getString("genero")), Map.entry("color", rs.getString("color")),
                 Map.entry("producto", rs.getString("producto")), Map.entry("responsable", rs.getString("responsable_nombre") + " " + rs.getString("responsable_apellido")),
                 Map.entry("proveedor", value(rs.getString("proveedor"))));
     }

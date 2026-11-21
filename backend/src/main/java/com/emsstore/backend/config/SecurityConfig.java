@@ -22,8 +22,8 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login", "/api/health", "/error").permitAll()
-                .requestMatchers("/api/usuarios/**", "/api/reportes/**").hasRole("Administrador")
+                .requestMatchers("/api/auth/login", "/api/auth/forgot-password", "/api/auth/reset-password", "/api/health", "/error").permitAll()
+                .requestMatchers("/api/usuarios/**", "/api/reportes/**", "/api/dashboard/**").hasRole("Administrador")
                 .requestMatchers(HttpMethod.POST, "/api/productos/**").hasAnyRole("Administrador", "Almacén")
                 .requestMatchers(HttpMethod.PUT, "/api/productos/**").hasAnyRole("Administrador", "Almacén")
                 .requestMatchers(HttpMethod.DELETE, "/api/productos/**").hasRole("Administrador")
@@ -33,8 +33,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/marcas/**", "/api/categorias/**", "/api/proveedores/**").hasRole("Administrador")
                 .requestMatchers(HttpMethod.PUT, "/api/marcas/**", "/api/categorias/**", "/api/proveedores/**").hasRole("Administrador")
                 .requestMatchers(HttpMethod.DELETE, "/api/marcas/**", "/api/categorias/**", "/api/proveedores/**").hasRole("Administrador")
-                .requestMatchers(HttpMethod.POST, "/api/inventario/importar/excel", "/api/movimientos/**").hasAnyRole("Administrador", "Almacén")
-                .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/marcas/**", "/api/categorias/**", "/api/proveedores/**", "/api/variantes/**", "/api/movimientos/**", "/api/alertas/**", "/api/dashboard/**", "/api/inventario/exportar/**").hasAnyRole("Administrador", "Almacén", "Ventas")
+                .requestMatchers(HttpMethod.POST, "/api/inventario/importar/excel").hasAnyRole("Administrador", "Almacén")
+                .requestMatchers(HttpMethod.POST, "/api/movimientos", "/api/movimientos/**").hasAnyRole("Administrador", "Almacén", "Ventas")
+                .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/marcas/**", "/api/categorias/**", "/api/proveedores/**", "/api/variantes/**", "/api/movimientos/**", "/api/alertas/**", "/api/inventario/exportar/**").hasAnyRole("Administrador", "Almacén", "Ventas")
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll())
             .addFilterBefore(bearerTokenFilter, UsernamePasswordAuthenticationFilter.class);

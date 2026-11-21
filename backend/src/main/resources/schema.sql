@@ -60,12 +60,13 @@ CREATE TABLE IF NOT EXISTS variantes_producto (
   id INT PRIMARY KEY AUTO_INCREMENT,
   producto_id INT NOT NULL,
   talla VARCHAR(20) NOT NULL,
+  genero VARCHAR(20) NOT NULL DEFAULT 'Hombre',
   color VARCHAR(40) NOT NULL,
   codigo_unico VARCHAR(50) NOT NULL UNIQUE,
   stock_actual INT NOT NULL DEFAULT 0,
   stock_minimo INT NOT NULL DEFAULT 0,
   CONSTRAINT fk_variante_producto FOREIGN KEY (producto_id) REFERENCES productos(id),
-  CONSTRAINT uq_variante UNIQUE (producto_id,talla,color),
+  CONSTRAINT uq_variante UNIQUE (producto_id,talla,color,genero),
   CONSTRAINT chk_stock_actual CHECK (stock_actual >= 0),
   CONSTRAINT chk_stock_minimo CHECK (stock_minimo >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -91,6 +92,17 @@ CREATE TABLE IF NOT EXISTS movimientos_inventario (
     (tipo='entrada' AND motivo IN ('compra','ajuste')) OR
     (tipo='salida' AND motivo IN ('venta','devolucion_proveedor','merma','ajuste'))
   )
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  usuario_id INT NOT NULL,
+  token_hash CHAR(64) NOT NULL UNIQUE,
+  expira_en DATETIME NOT NULL,
+  creado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_reset_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  INDEX idx_reset_usuario (usuario_id),
+  INDEX idx_reset_expira (expira_en)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Roles obligatorios para autorización por rol.

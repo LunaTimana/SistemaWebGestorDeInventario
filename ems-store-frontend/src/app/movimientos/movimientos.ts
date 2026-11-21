@@ -12,6 +12,7 @@ export class Movimientos implements OnInit {
   error = '';
   busqueda = '';
   tipoFiltro = '';
+  esVentas = false;
   resumen = [
     { titulo: 'Total entradas', subtitulo: 'Ingresos registrados', insignia: '0 uds', valor: '0 uds', detalle: 'Sin movimientos de entrada.', icono: 'bi-plus-circle', tono: 'verde' },
     { titulo: 'Total salidas', subtitulo: 'Salidas registradas', insignia: '0 uds', valor: '0 uds', detalle: 'Sin movimientos de salida.', icono: 'bi-dash-circle', tono: 'rojo' },
@@ -22,7 +23,14 @@ export class Movimientos implements OnInit {
     const q = this.busqueda.trim().toLocaleLowerCase();
     return this.movimientos.filter(m => (!this.tipoFiltro || m.tipo.toLowerCase() === this.tipoFiltro) && (!q || `${m.sku} ${m.producto} ${m.responsable} ${m.origen}`.toLocaleLowerCase().includes(q)));
   }
-  ngOnInit(): void { this.cargar(); }
+  ngOnInit(): void {
+    try {
+      this.esVentas = (JSON.parse(sessionStorage.getItem('emsStoreUser') ?? '{}') as { rol?: string }).rol === 'Ventas';
+    } catch {
+      this.esVentas = false;
+    }
+    this.cargar();
+  }
   cargar(): void {
     this.cargando = true; this.error = '';
     this.service.obtenerMovimientos().subscribe({

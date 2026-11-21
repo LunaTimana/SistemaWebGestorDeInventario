@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class TokenServiceTest {
     @Test
     void tokenFirmadoSeValidaYConservaUsuarioYRol() {
-        TokenService service = new TokenService("test-secret-with-enough-entropy", 600);
+        TokenService service = new TokenService("test-secret-with-more-than-enough-entropy", 600);
         String token = service.crearToken(42, "Almacén");
         TokenService.Claims claims = service.validar(token);
         assertNotNull(claims);
@@ -17,14 +17,14 @@ class TokenServiceTest {
 
     @Test
     void tokenAlteradoSeRechaza() {
-        TokenService service = new TokenService("test-secret-with-enough-entropy", 600);
+        TokenService service = new TokenService("test-secret-with-more-than-enough-entropy", 600);
         String token = service.crearToken(42, "Administrador");
         assertNull(service.validar(token + "x"));
     }
 
     @Test
-    void tokenExpiradoSeRechaza() {
-        TokenService service = new TokenService("test-secret-with-enough-entropy", -1);
-        assertNull(service.validar(service.crearToken(7, "Ventas")));
+    void rechazaConfiguracionDeClaveDebilODuracionInvalida() {
+        assertThrows(IllegalStateException.class, () -> new TokenService("weak", 600));
+        assertThrows(IllegalStateException.class, () -> new TokenService("test-secret-with-more-than-enough-entropy", -1));
     }
 }

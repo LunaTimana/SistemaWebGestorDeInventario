@@ -26,7 +26,7 @@ export class RegistrarEntrada implements OnInit {
   ngOnInit(): void {
     forkJoin({ productos: this.service.obtenerProductos(), variantes: this.service.obtenerVariantes(), proveedores: this.service.obtenerProveedores() }).subscribe({
       next: ({ productos, variantes, proveedores }) => {
-        this.variantes = variantes.map(v => ({ ...v, nombreProducto: productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`, etiqueta: `${v.codigoUnico} · ${productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`} · ${v.talla}/${v.color} (stock: ${v.stockActual})` }));
+        this.variantes = variantes.map(v => ({ ...v, nombreProducto: productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`, etiqueta: `${v.codigoUnico} · ${productos.find(p => p.id === v.productoId)?.nombreModelo ?? `Producto #${v.productoId}`} · ${v.genero ?? 'Hombre'} ${v.talla}/${v.color} (stock: ${v.stockActual})` }));
         this.proveedores = proveedores;
         const varianteSolicitada = Number(this.route.snapshot.queryParamMap.get('varianteId'));
         if (varianteSolicitada && this.variantes.some(v => v.id === varianteSolicitada)) this.varianteId = varianteSolicitada;

@@ -29,15 +29,17 @@ export class Reportes implements OnInit {
       }, error: e => { this.error = e?.error?.detail || 'No se pudo consultar el reporte en el backend.'; this.cargando = false; this.cdr.markForCheck(); }
     });
   }
-  generar(id:string): void {
+  generar(id:string, formato:'excel'|'pdf'): void {
     if (this.exportando) return;
-    this.exportando = id; this.error = '';
-    const solicitud = id === 'inventario' ? this.service.exportarInventarioExcel() : this.service.exportarMovimientosExcel();
+    this.exportando = `${id}-${formato}`; this.error = '';
+    const solicitud = id === 'inventario'
+      ? (formato === 'pdf' ? this.service.exportarInventarioPdf() : this.service.exportarInventarioExcel())
+      : (formato === 'pdf' ? this.service.exportarMovimientosPdf() : this.service.exportarMovimientosExcel());
     solicitud.subscribe({ next: blob => {
       const url = URL.createObjectURL(blob); const a = document.createElement('a');
-      a.href=url; a.download=id === 'inventario' ? 'EMS-Store-Inventario.xlsx' : 'EMS-Store-Movimientos.xlsx';
-      a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); this.exportando='';
-    }, error: e => { this.error = e?.error?.detail || 'No se pudo generar el reporte.'; this.exportando=''; } });
+      a.href=url; a.download=`EMS-Store-${id === 'inventario' ? 'Inventario' : 'Movimientos'}.${formato === 'pdf' ? 'pdf' : 'xlsx'}`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); this.exportando=''; this.cdr.markForCheck();
+    }, error: e => { this.error = e?.error?.detail || `No se pudo generar el reporte ${formato.toUpperCase()}.`; this.exportando=''; this.cdr.markForCheck(); } });
   }
   colorPorcentaje(porcentaje:number): string {
     const acotado = Math.max(0, Math.min(100, porcentaje));

@@ -18,6 +18,7 @@ export class Usuarios implements OnInit {
   error = '';
   mensaje = '';
   contrasenaTemporal = '';
+  claveCopiada = false;
   ngOnInit(): void { this.cargar(); }
   cargar(): void {
     this.cargando = true; this.error = '';
@@ -39,10 +40,14 @@ export class Usuarios implements OnInit {
     this.service.cambiarEstadoUsuario(u.id,nuevo).subscribe({next:r=>{this.mensaje=r.mensaje;this.cargar();},error:e=>this.error=e?.error?.detail || 'No se pudo cambiar el estado del usuario.'});
   }
   crearUsuario():void {
-    this.error='';this.mensaje='';this.contrasenaTemporal='';
+    this.error='';this.mensaje='';this.contrasenaTemporal='';this.claveCopiada=false;
     const partes=this.nombreCompleto.trim().split(/\s+/);
     if(partes.length<2 || !this.correo.trim() || !this.correo.includes('@')){this.error='Ingresa nombre y apellido, además de un correo válido.';return;}
     this.guardando=true;
     this.service.crearUsuario({nombre:partes[0],apellido:partes.slice(1).join(' '),correo:this.correo.trim(),rol:this.rolNuevo}).subscribe({next:r=>{this.mensaje=r.mensaje;this.contrasenaTemporal=r.contrasenaTemporal;this.nombreCompleto='';this.correo='';this.guardando=false;this.cargar();},error:e=>{this.error=e?.error?.detail || 'No se pudo crear el usuario.';this.guardando=false;}});
+  }
+  copiarContrasenaTemporal():void {
+    if (!this.contrasenaTemporal || !navigator.clipboard) return;
+    navigator.clipboard.writeText(this.contrasenaTemporal).then(() => this.claveCopiada = true);
   }
 }
