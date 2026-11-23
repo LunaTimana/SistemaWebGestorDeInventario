@@ -1,5 +1,7 @@
 # EMS Store - Backend integrado
 
+./mvnw clean package -> empaqueta en JAR, construye la aplicaicon con maven
+
 ## Conexion MySQL (siguiendo el patron de ProyWeb)
 
 La conexion se configura en `backend/src/main/resources/application-mysql.properties` mediante variables de entorno:
