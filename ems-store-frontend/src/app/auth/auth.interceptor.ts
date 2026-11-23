@@ -19,7 +19,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     : request;
 
   return next(authenticatedRequest).pipe(
-    timeout({ first: 30000 }),
+    timeout({ first: 15000 }),
     finalize(() => {
       // Las respuestas de HttpClient son asíncronas; en modo zoneless hay que
       // notificar explícitamente que cambió el estado de los componentes.

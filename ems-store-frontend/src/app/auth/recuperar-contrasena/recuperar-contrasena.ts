@@ -26,7 +26,10 @@ export class RecuperarContrasena {
     this.mensaje = '';
     this.cargando = true;
     this.auth.solicitarRecuperacion(this.correo.trim()).pipe(finalize(() => this.cargando = false))
-      .subscribe({ next: r => this.mensaje = r.mensaje, error: () => this.error = 'No se pudo procesar la solicitud. Revisa la conexión e inténtalo de nuevo.' });
+      .subscribe({
+        next: r => this.mensaje = r.mensaje,
+        error: e => this.error = e?.error?.message || e?.error?.detail || 'No se pudo procesar la solicitud. Revisa la conexión e inténtalo de nuevo.',
+      });
   }
 
   guardar(): void {

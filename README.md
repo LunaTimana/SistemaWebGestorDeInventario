@@ -14,11 +14,14 @@ Requisitos: MySQL 8.0.16 o superior, Java 21 y Node.js/npm. Mantén MySQL en eje
    $jwtBytes = [byte[]]::new(32)
    [Security.Cryptography.RandomNumberGenerator]::Fill($jwtBytes)
    $env:JWT_SECRET = [Convert]::ToBase64String($jwtBytes)
+   $env:MAIL_USERNAME = "tu-cuenta@gmail.com"
+   $env:MAIL_PASSWORD = "CONTRASENA_DE_APLICACION_GMAIL"
+   $env:APP_FRONTEND_URL = "http://localhost:4200"
    Set-Location .\backend
    .\mvnw.cmd spring-boot:run
    ```
 
-   Deja esta ventana abierta. El backend debe indicar que arrancó en el puerto **8083**. La conexión predeterminada es `localhost:3306/ems_store`; `DB_URL` permite cambiarla. Hibernate valida el esquema existente y no crea ni modifica tablas.
+   Deja esta ventana abierta. El backend debe indicar que arrancó en el puerto **8080**. Configura `MAIL_USERNAME` con la cuenta Gmail remitente y `MAIL_PASSWORD` con su contraseña de aplicación (requiere verificación en dos pasos; no uses la contraseña normal). La conexión predeterminada es `localhost:3306/ems_store`; `DB_URL` permite cambiarla.
 3. Abre una segunda ventana de PowerShell en la carpeta del proyecto y ejecuta:
 
    ```powershell
@@ -26,14 +29,14 @@ Requisitos: MySQL 8.0.16 o superior, Java 21 y Node.js/npm. Mantén MySQL en eje
    npm start
    ```
 
-   Abre la dirección que muestre Angular (normalmente `http://localhost:4200`). El proxy de desarrollo reenvía `/api` a `http://localhost:8083`; abre el frontend mediante Angular, no como archivo local ni con otro servidor.
-4. Inicia sesión con `admin@emsstore.com` y `admin123` (cuenta local de demostración).
+   Abre la dirección que muestre Angular (normalmente `http://localhost:4200`). Abre el frontend mediante Angular, no como archivo local ni con otro servidor.
+4. Inicia sesión con `admin@emsstore.com` y `d` (cuenta local de demostración).
 
 Para confirmar el backend desde otra ventana de PowerShell, prueba el login directamente:
 
 ```powershell
-$body = @{ correo = "admin@emsstore.com"; contrasena = "admin123" } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri http://localhost:8083/api/auth/login -ContentType "application/json" -Body $body
+$body = @{ correo = "admin@emsstore.com"; contrasena = "" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://localhost:8080/api/auth/login -ContentType "application/json" -Body $body
 ```
 
 Si esta petición falla, revisa primero la ventana del backend, las credenciales de MySQL y que `DB_EMS_Prueba1.sql` se haya ejecutado. Si responde con un token, pero la pantalla no entra, revisa que Angular se haya iniciado con `npm start` en el puerto 4200 y recarga la página.
@@ -47,7 +50,7 @@ Set-Location .\backend
 .\mvnw.cmd test
 ```
 
-Apache POI (`poi-ooxml`) está configurado en Maven para leer archivos `.xlsx`. La API de importación es `POST http://localhost:8083/api/importaciones/stock` con `multipart/form-data`: campo `archivo` requerido, `confirmar` opcional (por defecto `false`) y `responsableId` requerido al confirmar la importación.
+Apache POI (`poi-ooxml`) está configurado en Maven para leer archivos `.xlsx`. La API de importación es `POST http://localhost:8080/api/importaciones/stock` con `multipart/form-data`: campo `archivo` requerido, `confirmar` opcional (por defecto `false`) y `responsableId` requerido al confirmar la importación.
 
 ## Seguridad (RNF01)
 
