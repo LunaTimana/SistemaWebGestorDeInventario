@@ -1,6 +1,7 @@
 import { ApplicationRef, inject } from '@angular/core';
 import { HttpInterceptorFn } from '@angular/common/http';
 import { finalize, timeout } from 'rxjs';
+import { API_URL } from '../api-url';
 
 /**
  * Angular 22 trabaja sin Zone.js por defecto. Los componentes usan suscripciones
@@ -12,8 +13,8 @@ import { finalize, timeout } from 'rxjs';
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const appRef = inject(ApplicationRef);
   const token = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('emsStoreToken') : null;
-  const isBackendRequest = request.url.startsWith('http://localhost:8080/api/');
-  const isLoginRequest = request.url === 'http://localhost:8080/api/auth/login';
+  const isBackendRequest = request.url.startsWith(`${API_URL}/`);
+  const isLoginRequest = request.url === `${API_URL}/auth/login`;
   const authenticatedRequest = token && isBackendRequest && !isLoginRequest
     ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
     : request;
