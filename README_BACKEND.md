@@ -78,3 +78,29 @@ Los IDs de marca y categoría deben existir previamente. La eliminacion puede fa
 ## Seguridad, movimientos y Excel
 
 El login ahora devuelve un token Bearer firmado; las llamadas privadas deben incluirlo. Define `JWT_SECRET` en el entorno y no uses el secreto de desarrollo en producción. La API `POST /api/movimientos` actualiza stock e historial en una sola transacción; `GET /api/movimientos` consulta el historial. `POST /api/inventario/importar/excel` recibe multipart/form-data con el campo `archivo` y procesa las columnas SKU, Stock actual y Stock mínimo de un `.xlsx` exportado desde el sistema. La importación solo modifica SKU ya existentes y registra ajustes cuando cambia el stock.
+
+## Desplegar el backend en Render con TiDB Cloud
+
+El backend está separado en `backend/` y se despliega como un servicio Docker con Java 21. El manifiesto `render.yaml` señala `backend/` como raíz del servicio; así Render no usa Node para compilar el backend. El frontend Angular permanece en `ems-store-frontend/` y se despliega como un servicio independiente.
+
+1. Sube estos cambios al repositorio conectado a Render.
+2. En Render, crea un **Blueprint** desde el repositorio y revisa el servicio `ems-store-backend` de `render.yaml`. Si lo creas manualmente, elige **Docker** como Runtime y `backend` como Root Directory.
+3. En TiDB Cloud, abre **Connect** para tu clúster y copia el host, el usuario, la contraseña y el nombre de la base. Autoriza las conexiones entrantes necesarias en la lista de acceso del clúster.
+4. Completa en Render las variables solicitadas:
+
+   - `DB_URL`: `jdbc:mysql://<HOST_TIDB>:4000/<BASE_DE_DATOS>?sslMode=VERIFY_IDENTITY&enabledTLSProtocols=TLSv1.2,TLSv1.3`
+   - `DB_USERNAME`: el usuario que muestra TiDB Cloud (en Starter/Essential puede incluir un prefijo del clúster).
+   - `DB_PASSWORD`: contraseña de ese usuario.
+   - `JWT_SECRET`: secreto aleatorio de al menos 32 caracteres.
+   - `APP_FRONTEND_URL`: origen publicado del frontend Angular, por ejemplo `https://ems-store-frontend.onrender.com` (sin ruta final).
+   - `MAIL_USERNAME`: dirección Gmail que enviará los correos de recuperación.
+   - `MAIL_PASSWORD`: contraseña de aplicación de Google para esa cuenta, sin espacios; no uses la contraseña normal de Gmail.
+
+   TiDB Cloud requiere TLS para los planes Starter y Essential. La URL de arriba fuerza TLS y valida el certificado y el nombre del host.
+5. Despliega. Render revisará `GET /api/health`; cuando el servicio esté activo, esa ruta debe responder JSON y mostrar la base conectada.
+
+No uses `localhost` en `DB_URL` en Render: allí `localhost` apunta al contenedor del backend, no a TiDB. Conserva la URL JDBC como `DB_URL` y coloca las credenciales en las variables separadas.
+
+La URL del backend aparecerá en Render como `https://<servicio>.onrender.com`. Al publicar Angular por separado, su configuración de API debe apuntar a `https://<servicio>.onrender.com/api`; el origen de Angular debe coincidir con `APP_FRONTEND_URL` para que CORS permita las llamadas.
+
+Para obtener `MAIL_PASSWORD`, habilita la verificación en dos pasos en la cuenta Google y crea una contraseña de aplicación desde la configuración de seguridad de la cuenta. Guárdala como variable secreta en Render.
